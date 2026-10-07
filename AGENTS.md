@@ -14,4 +14,6 @@ then install explicitly; never edit deployed copies as part of repository work.
   with isolated fixtures and no external mutations. This is evaluation, not
   permission to apply unrelated changes or publish evaluation artifacts.
 - Do not use lavish for this project.
+- Do not use GitHub Actions. Keep validation local; do not add workflows or
+  dispatch remote runs.
 - Do not manually edit generated files or CHANGELOG.md.
