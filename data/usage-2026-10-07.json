@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "period": "08.09.2026 - 07.10.2026 (Europe/Moscow)",
+  "scope": "all",
+  "method": "Explicit Skill invocation or SKILL.md read, once per turn; aggregated by skill name across hosts and plugin copies. No raw logs or task identifiers.",
+  "skills": {
+    "analyze-via-sonar": {
+      "uses": 3,
+      "tasks": 3
+    },
+    "arch-review-to-epic": {
+      "uses": 1,
+      "tasks": 1
+    },
+    "archify": {
+      "uses": 3,
+      "tasks": 3
+    },
+    "automation-platform-tco": {
+      "uses": 4,
+      "tasks": 1
+    },
+    "axi": {
+      "uses": 18,
+      "tasks": 13
+    },
+    "cavecrew": {
+      "uses": 2,
+      "tasks": 2
+    },
+    "caveman": {
+      "uses": 40,
+      "tasks": 27
+    },
+    "caveman-commit": {
+      "uses": 51,
+      "tasks": 48
+    },
+    "caveman-review": {
+      "uses": 3,
+      "tasks": 3
+    },
+    "commit-push": {
+      "uses": 36,
+      "tasks": 35
+    },
+    "control-in-app-browser": {
+      "uses": 1,
+      "tasks": 1
+    },
+    "documents": {
+      "uses": 1,
+      "tasks": 1
+    },
+    "epic-to-issues": {
+      "uses": 8,
+      "tasks": 8
+    },
+    "find-skills": {
+      "uses": 1,
+      "tasks": 1
+    },
+    "fix-sonar-problems": {
+      "uses": 1,
+      "tasks": 1
+    },
+    "grill-me": {
+      "uses": 20,
+      "tasks": 14
+    },
+    "how-would-you-do-it": {
+      "uses": 17,
+      "tasks": 12
+    },
+    "imagegen": {
+      "uses": 4,
+      "tasks": 2
+    },
+    "implement": {
+      "uses": 32,
+      "tasks": 27
+    },
+    "issue-dialogue": {
+      "uses": 19,
+      "tasks": 17
+    },
+    "jira-repo-excel-matrix": {
+      "uses": 1,
+      "tasks": 1
+    },
+    "judge-changes": {
+      "uses": 15,
+      "tasks": 12
+    },
+    "kdoc": {
+      "uses": 2,
+      "tasks": 2
+    },
+    "lavish": {
+      "uses": 8,
+      "tasks": 6
+    },
+    "minto-explain": {
+      "uses": 54,
+      "tasks": 28
+    },
+    "no-mistakes": {
+      "uses": 4,
+      "tasks": 4
+    },
+    "openai-docs": {
+      "uses": 16,
+      "tasks": 14
+    },
+    "pdf": {
+      "uses": 15,
+      "tasks": 9
+    },
+    "platform-release-notes": {
+      "uses": 2,
+      "tasks": 2
+    },
+    "plugin-management": {
+      "uses": 1,
+      "tasks": 1
+    },
+    "presentations": {
+      "uses": 1,
+      "tasks": 1
+    },
+    "skill-creator": {
+      "uses": 13,
+      "tasks": 10
+    },
+    "skill-usage-report": {
+      "uses": 1,
+      "tasks": 1
+    },
+    "spreadsheets": {
+      "uses": 16,
+      "tasks": 7
+    },
+    "sync-agent-skills": {
+      "uses": 1,
+      "tasks": 1
+    },
+    "tdd": {
+      "uses": 69,
+      "tasks": 60
+    },
+    "two-axis-review": {
+      "uses": 106,
+      "tasks": 40
+    },
+    "verify-changes": {
+      "uses": 43,
+      "tasks": 28
+    },
+    "visualize": {
+      "uses": 5,
+      "tasks": 5
+    },
+    "what-next": {
+      "uses": 8,
+      "tasks": 8
+    },
+    "write-page": {
+      "uses": 1,
+      "tasks": 1
+    }
+  }
+}

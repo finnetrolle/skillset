@@ -6,7 +6,9 @@ description: Behavior-first testing, regression TDD and independent test oracles
 # Behavior-first development and TDD
 
 Protect observable behavior with independent expectations and fast feedback.
-Read `CONTEXT.md` when present and the relevant ADRs; use the domain vocabulary.
+Read the project's glossary (`GLOSSARY.md`, or its established `CONTEXT.md`)
+when present and the relevant ADRs; use the domain vocabulary. Follow an
+existing `GLOSSARY-MAP.md` when several contexts have separate glossaries.
 Repository rules and the user's explicit testing mode select the workflow.
 
 ## Choose the mode

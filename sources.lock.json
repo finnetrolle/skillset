@@ -5,7 +5,19 @@
     "mattpocock": {
       "repository": "https://github.com/mattpocock/skills.git",
       "revision": "dd400c3ad65e57c06f05e832e0aac92c7992f34d",
-      "license": "MIT"
+      "license": "MIT",
+      "skill_paths": {
+        "tdd": "skills/engineering/tdd",
+        "implement": "skills/engineering/implement",
+        "two-axis-review": "skills/engineering/code-review",
+        "grill-me": "skills/productivity/grill-me",
+        "issue-dialogue": "skills/engineering/to-spec",
+        "epic-to-issues": "skills/engineering/to-tickets",
+        "arch-review-to-epic": "skills/engineering/improve-codebase-architecture",
+        "diagnosing-bugs": "skills/engineering/diagnosing-bugs",
+        "domain-modeling": "skills/engineering/domain-modeling",
+        "writing-for-agents": "skills/productivity/writing-for-agents"
+      }
     }
   },
   "skills": {
@@ -37,7 +49,10 @@
           "sha256": "ea6dca99589732f03d03e23974f4ebee0c913a4158d4601cc21144563d92d7b5",
           "executable": false
         }
-      }
+      },
+      "dependencies": [
+        "epic-to-issues"
+      ]
     },
     "automation-platform-tco": {
       "origin": "local",
@@ -295,7 +310,10 @@
           "sha256": "dc64dc624c20722a453247745382fe70f23a6bbc00eb03d660d9d6ac76b3479b",
           "executable": false
         }
-      }
+      },
+      "dependencies": [
+        "domain-modeling"
+      ]
     },
     "issue-dialogue": {
       "origin": "local",
@@ -309,7 +327,10 @@
           "sha256": "da418c937eb61ea4ab66b14632d9e169a226a7437724d21350338d2ecdf2704a",
           "executable": false
         }
-      }
+      },
+      "dependencies": [
+        "domain-modeling"
+      ]
     },
     "kdoc": {
       "origin": "local",
@@ -543,7 +564,10 @@
           "sha256": "8346d4417139c2a7c05448995897afb17312955045ba487ef5ed40cb96e15095",
           "executable": false
         }
-      }
+      },
+      "dependencies": [
+        "verify-changes"
+      ]
     },
     "verify-changes": {
       "origin": "local",
@@ -561,7 +585,10 @@
           "sha256": "1333378ef59ea95c8738f3da0df8f9dfadfa3eca05b57e20b5138fef5f0cb090",
           "executable": true
         }
-      }
+      },
+      "dependencies": [
+        "two-axis-review"
+      ]
     },
     "what-next": {
       "origin": "local",
@@ -571,7 +598,11 @@
           "sha256": "48d754c800c75224b7e597ad26755fb6b39b62564e3044d787bb140910b29b49",
           "executable": false
         }
-      }
+      },
+      "dependencies": [
+        "caveman",
+        "verify-changes"
+      ]
     },
     "workshop-thesis-factcheck": {
       "origin": "local",
@@ -1389,7 +1420,10 @@
           "sha256": "970cc277ab76bb253b078a6ee2e075821f1832970e539b281b31c2a9fa28a249",
           "executable": false
         }
-      }
+      },
+      "dependencies": [
+        "caveman-commit"
+      ]
     },
     "how-would-you-do-it": {
       "origin": "local",
@@ -1417,7 +1451,11 @@
           "sha256": "89a6027eb0e86e7d9d21ef333cb44a7f6058961ddf673d10e6af3c308aaed5b5",
           "executable": false
         }
-      }
+      },
+      "dependencies": [
+        "tdd",
+        "verify-changes"
+      ]
     },
     "jira-repo-excel-matrix": {
       "origin": "local",
@@ -1445,7 +1483,10 @@
           "sha256": "e8781859916038d7bf9aa4fd650a89ff0dd0e897965b18e0947bf164e66377d5",
           "executable": false
         }
-      }
+      },
+      "dependencies": [
+        "caveman"
+      ]
     },
     "platform-release-notes": {
       "origin": "local",
@@ -1500,6 +1541,82 @@
           "executable": false
         }
       }
+    },
+    "diagnosing-bugs": {
+      "origin": "mattpocock",
+      "upstream_source": "mattpocock",
+      "upstream_path": "skills/engineering/diagnosing-bugs",
+      "baseline_files": {
+        "LICENSE": {
+          "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+          "executable": false
+        },
+        "SKILL.md": {
+          "sha256": "9168404abda0967a5d32977e3498cd95fda6807018852f3de736a78357c82b40",
+          "executable": false
+        },
+        "agents/openai.yaml": {
+          "sha256": "3e430dbe4334a87597488c060cb3dc3786bb00c9182877d6f5ec41f62490e90b",
+          "executable": false
+        },
+        "scripts/hitl-loop.template.sh": {
+          "sha256": "35103539fc36873eea36074769ad454f9379d6fc8b2dc0e26ce987fd3bfe5503",
+          "executable": false
+        }
+      },
+      "dependencies": []
+    },
+    "domain-modeling": {
+      "origin": "mattpocock",
+      "upstream_source": "mattpocock",
+      "upstream_path": "skills/engineering/domain-modeling",
+      "baseline_files": {
+        "ADR-FORMAT.md": {
+          "sha256": "944c92aa790e8fbdc9199640b170979abb8a34ba8d0fe18c2a01a63bce140ca0",
+          "executable": false
+        },
+        "GLOSSARY-FORMAT.md": {
+          "sha256": "21dcc40cdec8e151a829b98ab1517c1867bc444e3665134a98c6983411996801",
+          "executable": false
+        },
+        "LICENSE": {
+          "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+          "executable": false
+        },
+        "SKILL.md": {
+          "sha256": "7b925d7b1e341a2eeae33ad68a8a8c0ab889a38ddd22a7598e4c240e5a7556a3",
+          "executable": false
+        },
+        "agents/openai.yaml": {
+          "sha256": "f6bf2aa996c6e6f53fdd0708e18a0d16a56aed8322cca59fedbe3c0d2c75f06b",
+          "executable": false
+        }
+      },
+      "dependencies": []
+    },
+    "writing-for-agents": {
+      "origin": "mattpocock",
+      "upstream_source": "mattpocock",
+      "upstream_path": "skills/productivity/writing-for-agents",
+      "baseline_files": {
+        "LICENSE": {
+          "sha256": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+          "executable": false
+        },
+        "SKILL-MECHANICS.md": {
+          "sha256": "c768e6307c7c10728c401c213f2c4ba71c542127eeb7ad2956aabd15a0fa0059",
+          "executable": false
+        },
+        "SKILL.md": {
+          "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+          "executable": false
+        },
+        "agents/openai.yaml": {
+          "sha256": "eacb24b2a618cfb81dacb0416f4fdd75ddf3a8060f8ddb99aae1b1e301907e4b",
+          "executable": false
+        }
+      },
+      "dependencies": []
     }
   }
 }

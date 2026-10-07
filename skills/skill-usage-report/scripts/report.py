@@ -11,7 +11,7 @@ import re
 import sqlite3
 from zoneinfo import ZoneInfo
 
-SKILL_PATH = re.compile(r"(?P<path>(?:/|~[/\\])[^\s\"']*[/\\]skills[/\\](?P<name>[a-z][a-z0-9-]*)[/\\]SKILL\.md)\b", re.I)
+SKILL_PATH = re.compile(r"(?P<path>(?:/|~[/\\])[^\s\"']*[/\\]skills[/\\](?:\.system[/\\])?(?P<name>[a-z][a-z0-9-]*)[/\\]SKILL\.md)\b", re.I)
 READ_VERB = re.compile(r"\b(cat|sed|head|tail|less|more|read_text|read_file|Get-Content|Read)\b", re.I)
 
 
@@ -107,7 +107,7 @@ class Report:
                 row["tokens"] += tokens
 
 
-def codex(report, codex_home, start, stop, roots):
+def codex(report, codex_home, start, stop, roots, all_tasks=False):
     state = codex_home / "state_5.sqlite"
     history = codex_home / "thread_history_1.sqlite"
     if not state.is_file() or not history.is_file():
@@ -120,7 +120,7 @@ def codex(report, codex_home, start, stop, roots):
                             "WHERE updated_at>=? AND created_at<?", (int(start), int(stop))).fetchall()
         parents = dict(s.execute("SELECT child_thread_id,parent_thread_id FROM thread_spawn_edges"))
         for thread_id, path, cwd, remote in threads:
-            if not is_dev(cwd, remote, roots):
+            if not all_tasks and not is_dev(cwd, remote, roots):
                 continue
             turns = {tid: (started, completed) for tid, started, completed in h.execute(
                 "SELECT turn_id,started_at,completed_at FROM thread_turns "
@@ -189,7 +189,7 @@ def human_prompt(record):
     return False
 
 
-def claude(report, claude_home, start, stop, roots):
+def claude(report, claude_home, start, stop, roots, all_tasks=False):
     projects = claude_home / "projects"
     if not projects.is_dir():
         report.warnings.append("Журналы Claude Code недоступны")
@@ -204,7 +204,7 @@ def claude(report, claude_home, start, stop, roots):
         turn = None
         cwd = None
         def flush():
-            if turn and is_dev(cwd, None, roots) and start <= turn["start"] < stop:
+            if turn and (all_tasks or is_dev(cwd, None, roots)) and start <= turn["start"] < stop:
                 report.add_turn("Claude Code", task, turn["skills"],
                                 [(v[0], v[1]) for v in turn["messages"].values()],
                                 turn["last"], turn["start"])
@@ -258,8 +258,9 @@ def fmt_time(seconds):
     return f"{seconds / 3600:.1f} ч"
 
 
-def markdown(report, start, stop, tz):
-    lines = ["# Использование скиллов в задачах разработки", "",
+def markdown(report, start, stop, tz, all_tasks=False):
+    scope = "во всех задачах" if all_tasks else "в задачах разработки"
+    lines = [f"# Использование скиллов {scope}", "",
              f"Период: {dt.datetime.fromtimestamp(start, tz):%d.%m.%Y %H:%M} - "
              f"{dt.datetime.fromtimestamp(stop, tz):%d.%m.%Y %H:%M} ({tz.key}).", "",
              "| Скилл | Применений | Задач | Токенов после активации | Время после активации | Токенов/применение | Мин/применение | Источник |",
@@ -273,7 +274,7 @@ def markdown(report, start, stop, tz):
         lines.append("| Скиллы с подтверждённым применением не найдены | 0 | 0 | н/д | н/д | н/д | н/д | - |")
     lines += ["", "## Покрытие и интерпретация", ""]
     for source in ("Codex", "Claude Code"):
-        lines.append(f"- {source}: {report.coverage[source + ' turns']} ходов разработки, "
+        lines.append(f"- {source}: {report.coverage[source + ' turns']} ходов, "
                      f"{report.coverage[source + ' turns with skills']} со скиллами.")
     if report.coverage["unfinished turns"]:
         lines.append(f"- Незавершённых ходов: {report.coverage['unfinished turns']}; их время и токены частичны.")
@@ -300,6 +301,7 @@ def main():
     p.add_argument("--to", dest="date_to", help="YYYY-MM-DD, включительно")
     p.add_argument("--tz", default="Europe/Moscow")
     p.add_argument("--dev-root", action="append", help="Дополнительный корень проектов; повторяемый параметр")
+    p.add_argument("--all", action="store_true", dest="all_tasks", help="Все задачи, включая работу вне репозиториев")
     p.add_argument("--codex-home", type=Path, default=Path.home() / ".codex")
     p.add_argument("--claude-home", type=Path, default=Path.home() / ".claude")
     p.add_argument("--output", type=Path)
@@ -319,15 +321,15 @@ def main():
     roots = [Path(x).expanduser().resolve() for x in
              (["~/dev", "~/.no-mistakes/worktrees"] + (args.dev_root or []))]
     report = Report()
-    codex(report, args.codex_home.expanduser(), start, stop, roots)
-    claude(report, args.claude_home.expanduser(), start, stop, roots)
-    result = markdown(report, start, stop, tz)
+    codex(report, args.codex_home.expanduser(), start, stop, roots, args.all_tasks)
+    claude(report, args.claude_home.expanduser(), start, stop, roots, args.all_tasks)
+    result = markdown(report, start, stop, tz, args.all_tasks)
     if args.output:
         args.output.write_text(result, encoding="utf-8")
     else:
         print(result, end="")
     if args.json:
-        data = {"start": start, "stop": stop, "timezone": tz.key, "coverage": dict(report.coverage),
+        data = {"start": start, "stop": stop, "timezone": tz.key, "scope": "all" if args.all_tasks else "development", "coverage": dict(report.coverage),
                 "warnings": report.warnings,
                 "skills": {k: {**v, "tasks": len(v["tasks"]), "sources": sorted(v["sources"])}
                            for k, v in sorted(report.rows.items())}}
