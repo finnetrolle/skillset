@@ -15,7 +15,7 @@
 среды; менеджер их не устанавливает и не запускает код скиллов.
 
 ```sh
-git clone git@github.com:finnetrolle/skillset.git
+git clone https://github.com/finnetrolle/skillset.git
 cd skillset
 make setup
 make check test catalog-check
