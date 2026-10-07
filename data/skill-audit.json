@@ -512,6 +512,14 @@
     "audit_entry": "Anonymized as removed-presentation-template; original decisions and counts preserved.",
     "historical_catalogs": "Regenerated with scripts/catalog.py after excluding the template.",
     "retained_skill_packages": "Unchanged: 27 packages, 277 files.",
-    "commit_references": "Updated for the rewritten history; installed package fingerprints are unchanged."
+    "commit_references": "Updated for the rewritten history; installed package fingerprints are unchanged.",
+    "publication": {
+      "completed_on": "2026-10-07",
+      "public_repository": "https://github.com/finnetrolle/skillset",
+      "private_archive": "https://github.com/finnetrolle/skillset-private-archive",
+      "method": "Created a separate public repository with the sanitized history; renamed the original repository and retained its private visibility.",
+      "github_actions_enabled": false,
+      "anonymous_access": "Public repository and README accessible; historical cached objects belong to the separate private archive."
+    }
   }
 }
