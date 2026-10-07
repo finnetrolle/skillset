@@ -54,7 +54,7 @@ description: >
 
 Применяй установленный `caveman`: прочитай его `SKILL.md` один раз из каталога
 навыков текущей среды. В среде пользователя источник:
-[/Users/finnetrolle/.agents/skills/caveman/SKILL.md](/Users/finnetrolle/.agents/skills/caveman/SKILL.md).
+[caveman/SKILL.md](../caveman/SKILL.md).
 Сохраняй выбранный пользователем уровень; если не задан, используй `full`.
 Явная отмена сжатого стиля имеет приоритет: SCQA можно сохранить без него.
 

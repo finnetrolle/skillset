@@ -7,17 +7,19 @@ description: Route and implement one existing implementation-ready project issue
 
 Implement one tracked issue and hand its evidence to verification. Report the issue
 closed only after all required verification and repository completion steps have
-finished. Select the least expensive model that preserves the required quality.
+finished. Use execution settings capable of meeting the required quality.
 
 ## Input
 
-Treat the text after `$implement` as one exact work-item ID or unique issue title, for example `$implement VIG-45-23`.
+Resolve one exact existing issue or unique title from the source the user names.
+Read its full accepted contract, non-goals, hard prerequisites and repository
+completion rules. Do not infer readiness merely from an identifier or commit.
 
-- Require exactly one issue. Do not implement an epic or combine several work items.
-- Resolve an exact ID by searching issue files recursively for either an exact `# <ID>:` heading or the project's exact `**ID:** \`<ID>\`` metadata form. Require exactly one matching issue file. Then verify that a standalone issue is registered directly, or that a child issue is listed by its registered parent epic. Accept a title only when it has one unique issue-file match.
-- If the issue is missing or ambiguous, stop and show the matching candidates. Never guess.
-- Proceed only when the issue status is `Ready for implementation` or `In progress` and every hard dependency is `Done`.
-- For `Draft`, `Blocked`, or `Done`, stop with the concrete reason and the appropriate next action. Do not silently change the status or scope to make the issue executable.
+Use the repository's issue-tracker adapter when it has one. For a local
+`spec/WORK_ITEMS.md` registry, read [the local work-item adapter](references/work-items.md).
+Do not force that file layout or status vocabulary onto GitHub, GitLab or another
+tracker. If the issue is missing, ambiguous, not ready or blocked, report the
+specific gap; never change its status or requirements just to make it executable.
 
 ## Execution boundary
 
@@ -28,7 +30,7 @@ quality. Read the repository guide, issue, linked epic, hard prerequisites and
 relevant normative sections once; keep a compact contract/evidence map.
 
 Before coding, read the shared
-[acceptance evidence contract](../../../.agents/skills/verify-changes/references/acceptance-evidence.md).
+[acceptance evidence contract](../verify-changes/references/acceptance-evidence.md).
 Check how the exact agreed issue text and user amendments can be recovered for
 verification and completion. Record the source path, committed revision when
 available, and explicit amendments in the manifest. If the only agreed issue
@@ -48,48 +50,22 @@ worker. Do not spawn a worker solely to repeat the current model and effort.
 
 ## Route selection
 
-Before selecting a model, check the models and reasoning efforts exposed by the
-current `spawn_agent` tool. That runtime list is authoritative for worker
-availability; models listed only for task creation are not necessarily available
-to subagents. The mapping below is a routing policy, not a verified price table.
+Assess impact and implementation risk against the issue and repository rules.
+Read [the risk guide](references/risk-routing.md) when deciding whether the current
+execution settings fit. The host's exposed models, efforts and tools are the
+source of truth; never claim that a recommended setting has actually been applied.
+Honor the user's explicit model and budget choices.
 
-Assess both impact and implementation risk before choosing a route:
+Prefer the current agent when it can meet the required quality. A known mismatch
+can justify a supported switch or the exceptional single implementation worker
+below. Do not create a dispatcher/worker pair merely to repeat current settings.
+No model names or prices in this skill are a permanent routing table.
 
-- Read explicit priority, severity, milestone, release-gate, customer-impact, and blocking metadata when present. Do not invent missing metadata.
-- Treat changes to normative requirements, public contracts, mandatory release evidence, compliance or security claims, and work-item dependency/status semantics as high impact even when they are documentation-only.
-- Critical impact selects `critical`. High impact selects at least `standard`. Unknown impact on production behavior selects at least `standard`.
-
-Then choose one route from the table. Use the highest route whose conditions apply.
-
-| Route | Model and effort | Use when |
-|---|---|---|
-| `fast` | `gpt-5.6-luna`, `low` | Exact mechanical change with no production behavior change and no normative or release impact, such as a non-normative broken link or deterministic non-semantic metadata formatting. It must not change work-item status/dependencies, requirements, compliance/security claims, public/runtime contracts, or release evidence. |
-| `balanced` | `gpt-5.6-terra`, `medium` | Narrow, isolated, reversible change with explicit acceptance criteria and local tests; no critical-risk marker applies. |
-| `standard` | `gpt-5.6-terra`, `high` | Default for production code, multi-file behavior, integration work, non-trivial tests, or ordinary implementation uncertainty. |
-| `critical` | `gpt-6-astra`, `xhigh` | Concurrency, synchronization, streaming/backpressure, durability/persistence, security/privacy/auth, schema or data migration, public API/protocol compatibility, process lifecycle, data-loss risk, architecture boundaries, cross-process E2E, or a large/ambiguous blast radius. |
-
-This mapping was checked against the worker tool on 2026-09-08: it exposes
-`gpt-6-astra`, `gpt-5.6-sol`, `gpt-5.6-terra`, `gpt-5.6-luna`, and `gpt-5.5`.
-Astra is described there as the most capable model for complex, demanding work,
-so it owns `critical`. Sol and GPT-5.5 remain available but are not selected by
-these default routes. Recheck the live tool rather than treating this snapshot
-as permanent availability.
-
-Routing invariants:
-
-- Any production behavior change is at least `balanced`; when unsure, use `standard`.
-- Any critical marker makes the route `critical`, even if the diff is expected to be small.
-- Multiple modules, several interacting acceptance criteria, or unclear ownership make the route at least `standard`.
-- A high word count, many checklist items, or words such as `all` and `deterministic` are evidence to inspect, not automatic promotion by themselves.
-- Resolve ties upward. Never choose a cheaper route merely because the parent task already uses that model.
-- Confirm that the selected model supports the exact effort before spawning.
-  If either is unavailable, use the fallback below instead of silently
-  substituting another model or lowering the route.
-
-Report one concise route line, distinguishing recommended and verified settings:
+Report one concise line when routing is relevant:
 
 ```text
-Route: <route>; execution: inline | worker <verified model/effort>; reason: <risk>.
+Risk: <mechanical | bounded | standard | critical>; execution: inline | worker;
+settings: verified <model/effort> | current settings unverified; reason: <risk>.
 ```
 
 ## Implement
@@ -180,6 +156,6 @@ Lead with the exact state: implementation ready for verification; verified but
 closure pending; issue closed after verification and the repository completion
 protocol; or blocked with the concrete reason. Never call a ready implementation
 a closed issue. Name the responsible next phase and remaining actions from the
-evidence manifest. Include the selected route, a compact change summary,
+evidence manifest. Include any relevant routing decision, a compact change summary,
 validation results, and material risks. Do not expose internal chain-of-thought
 or repeat the entire issue.

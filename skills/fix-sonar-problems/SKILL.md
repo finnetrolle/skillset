@@ -1,6 +1,6 @@
 ---
 name: fix-sonar-problems
-description: Исправление технодолга из реестра sonar_problems.md по одной проблеме за раз: чтение записи, fix согласно рекомендации, проверка Gradle-сборкой, обновление реестра. Использовать, когда пользователь просит "исправь технодолг из sonar_problems", "исправь проблемы из sonar_problems.md", "fix sonar problems", "закрой находки SonarQube", или invokes /fix-sonar-problems.
+description: "Исправление технодолга из реестра sonar_problems.md по одной проблеме за раз: чтение записи, fix согласно рекомендации, проверка Gradle-сборкой, обновление реестра. Использовать, когда пользователь просит \"исправь технодолг из sonar_problems\", \"исправь проблемы из sonar_problems.md\", \"fix sonar problems\", \"закрой находки SonarQube\", или invokes /fix-sonar-problems."
 ---
 
 # Исправление проблем из sonar_problems.md
