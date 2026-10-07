@@ -21,11 +21,14 @@ Claude Code. Проверяет учёт .system, --all, дедупликаци�
 | domain-modeling | Совет о customer/client, CONTEXT.md существует, писать запрещено | Использован канонический customer; CONTEXT не менялся, glossary/ADR не создавались. |
 | writing-for-agents | Сократить release skill с explicit-only policy и approval | Контракт сохранён, публикации и правок policy нет. |
 | issue-dialogue | Записать согласованный /health header change | Локальная issue с evidence matrix без нового интервью; production fixture не менялся. |
+| diagnosing-bugs | CSV CLI складывает строки amount вместо чисел | CLI дважды воспроизвёл total "1020" вместо 30; исправлена одна строка, тот же subprocess test подтвердил числовой total и сохранение records. |
 
 Прогон также обнаружил неоднозначные безусловные фразы об обновлении
 GLOSSARY.md. Они заменены условными инструкциями с приоритетом CONTEXT.md и
 разрешённого scope. В reference writing-for-agents разделены Codex и Claude
 invocation controls.
+Повторное чтение обновлённых справочников подтвердило отсутствие этих
+противоречий; runtime discovery обоих хостов отдельно не проверялся.
 
 HTTP fixture baseline в sandbox не запустился из-за запрета bind localhost.
 Это ограничение поведенческого прогона, не подтверждение работоспособности
