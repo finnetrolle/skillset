@@ -13,7 +13,7 @@ then install explicitly; never edit deployed copies as part of repository work.
 - Behavioral evaluation of complex skill changes may use independent subagents
   with isolated fixtures and no external mutations. This is evaluation, not
   permission to apply unrelated changes or publish evaluation artifacts.
-- Do not use lavish for this project.
+- Use the repository's skill manager and local tools to maintain this set.
 - Do not use GitHub Actions. Keep validation local; do not add workflows or
   dispatch remote runs.
 - Do not manually edit generated files or CHANGELOG.md.

@@ -15,36 +15,19 @@
     "issue-dialogue",
     "axi",
     "how-would-you-do-it",
-    "pdf",
     "epic-to-issues",
-    "lavish",
     "what-next",
-    "automation-platform-tco",
     "analyze-via-sonar",
     "archify",
     "caveman-review",
     "cavecrew",
-    "kdoc",
-    "platform-release-notes",
     "arch-review-to-epic",
-    "find-skills",
-    "fix-sonar-problems",
     "jira-repo-excel-matrix",
     "skill-usage-report",
-    "sync-agent-skills",
-    "analyze-pitest",
-    "removed-presentation-template",
-    "caveman-compress",
-    "caveman-help",
-    "caveman-stats",
     "diagnosing-bugs",
     "domain-modeling",
-    "frontend-skill",
     "github-ai-trending-pdf",
-    "landing-redline",
-    "playwright",
     "security-best-practices",
-    "tailor-cv-to-vacancy",
     "workshop-thesis-factcheck",
     "writing-for-agents"
   ],
@@ -118,15 +101,6 @@
       "confirmed_on": "2026-10-07",
       "user_reason": "оставить"
     },
-    "pdf": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "использовать pdf буду только в codex",
-      "replacement": "pdf:pdf (Codex plugin)",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
     "epic-to-issues": {
       "decision": "keep-with-changes",
       "confirmed_on": "2026-10-07",
@@ -164,42 +138,10 @@
       "deployed_on": "2026-10-07",
       "deployment_transaction": "20261007T134925-914e67b1"
     },
-    "lavish": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "давай уберем lavish из системы совсем",
-      "deployment_action": "Remove installed skill aliases, installer registration, CLI cache and runtime state.",
-      "deployment_status": "complete",
-      "recovery_archive": ".cache/removals/lavish-20261007T112915",
-      "removed_components": [
-        "repository package",
-        "agent skill copies and aliases",
-        "installer registrations",
-        "lavish-axi npx cache",
-        "lavish-axi runtime state",
-        "13 targeted npm cache entries"
-      ],
-      "verification": {
-        "known_paths_absent": true,
-        "registries_absent": true,
-        "other_registry_entries_preserved": true,
-        "running_processes": 0,
-        "global_npm_installation": false,
-        "npm_cache_entries_remaining": 0
-      }
-    },
     "what-next": {
       "decision": "keep-as-is",
       "confirmed_on": "2026-10-07",
       "user_reason": "оставляй"
-    },
-    "automation-platform-tco": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "Специализированный скилл, не нужен в разработке.",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
     },
     "analyze-via-sonar": {
       "decision": "keep-with-changes",
@@ -277,42 +219,10 @@
       "deployed_on": "2026-10-07",
       "deployment_transaction": "20261007T134925-914e67b1"
     },
-    "kdoc": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "Правила документации должны настраиваться отдельно для каждого проекта; согласовано удалить глобальный kdoc.",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
-    "platform-release-notes": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "убираем",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
     "arch-review-to-epic": {
       "decision": "keep-as-is",
       "confirmed_on": "2026-10-07",
       "user_reason": "оставить"
-    },
-    "find-skills": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "можно убирать",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
-    "fix-sonar-problems": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "убираем",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
     },
     "jira-repo-excel-matrix": {
       "decision": "keep-as-is",
@@ -324,54 +234,6 @@
       "confirmed_on": "2026-10-07",
       "user_reason": "оставить"
     },
-    "sync-agent-skills": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "убираем",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
-    "analyze-pitest": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "убрать",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
-    "removed-presentation-template": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "убираем",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
-    "caveman-compress": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "убери",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
-    "caveman-help": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "убери",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
-    "caveman-stats": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "убирай",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
     "diagnosing-bugs": {
       "decision": "keep-as-is",
       "confirmed_on": "2026-10-07",
@@ -382,35 +244,10 @@
       "confirmed_on": "2026-10-07",
       "user_reason": "оставить"
     },
-    "frontend-skill": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "убрать. буду пользоваться им только в кодексе",
-      "deployment_action": "Preserve this skill for Codex only outside the shared repository-managed set; separate it from Claude access during explicit deployment after the audit. Do not delete the sole installed copy before preserving Codex access.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07",
-      "installed_location": "/Users/finnetrolle/.codex/skills/frontend-skill"
-    },
     "github-ai-trending-pdf": {
       "decision": "keep-as-is",
       "confirmed_on": "2026-10-07",
       "user_reason": "оставляем"
-    },
-    "landing-redline": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "удалить",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
-    "playwright": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "убираем",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
     },
     "security-best-practices": {
       "decision": "keep-as-is",
@@ -439,14 +276,6 @@
         "behavioral_evaluation": "Not repeated because skill instructions and resources did not change."
       }
     },
-    "tailor-cv-to-vacancy": {
-      "decision": "remove",
-      "confirmed_on": "2026-10-07",
-      "user_reason": "удалить",
-      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
-      "deployment_status": "complete",
-      "deployed_on": "2026-10-07"
-    },
     "workshop-thesis-factcheck": {
       "decision": "keep-as-is",
       "confirmed_on": "2026-10-07",
@@ -460,23 +289,16 @@
   },
   "completed_on": "2026-10-07",
   "summary": {
-    "reviewed": 44,
+    "reviewed_repository_skills": 27,
     "kept_as_is": 23,
     "kept_with_changes": 4,
-    "excluded_from_repository": 17,
     "repository_skills": 27,
-    "codex_only_outside_repository": [
-      "frontend-skill"
-    ],
-    "deployment_status": "complete",
     "github_publication_status": "complete",
     "verification": {
       "check": "passed: 27 skills, 277 files",
       "tests": "passed: 22 local tests",
       "catalog": "current",
-      "audit_consistency": "all 44 decisions recorded; repository contains exactly the 27 retained skills",
-      "install_dry_run": "4 updates, 23 unchanged, no conflicts",
-      "excluded_installed_packages": "15 pending removal, 1 Codex-only skill to preserve, lavish already absent; all 16 present packages match their tracked manifests"
+      "audit_consistency": "All 27 current packages have confirmed decisions; audit, usage selection, source catalog and folders agree."
     },
     "deployment": {
       "applied_on": "2026-10-07",
@@ -485,41 +307,17 @@
       "matching_skills": 27,
       "matching_files": 277,
       "installation_transaction": "20261007T134925-914e67b1",
-      "retirement_backup": "/Users/finnetrolle/.agents/skills/.skillset/retirements/20261007T134925-f61e3441",
-      "removed_installed_packages": 15,
-      "removed_excluded_claude_aliases": 14,
-      "created_claude_aliases": 10,
       "claude_canonical_aliases": 26,
       "claude_standalone_preserved": [
         "tdd"
       ],
-      "codex_only_location": "/Users/finnetrolle/.codex/skills/frontend-skill",
-      "pruned_legacy_installer_records": [
-        "caveman-compress",
-        "caveman-help",
-        "caveman-stats",
-        "find-skills"
-      ],
-      "idempotent_install": "unchanged",
-      "verification": "All retained repository packages match installed content and executable modes; all excluded personal paths absent except the Codex-only frontend copy; no pending transactions.",
-      "github": "Source commit pushed to origin/main in finnetrolle/skillset."
+      "scope": "Verified installation of the recorded source commit; later repository documentation edits are installed only by explicit command."
     }
   },
-  "publication_cleanup": {
+  "scope": "Current repository packages",
+  "publication": {
     "completed_on": "2026-10-07",
-    "scope": "All reachable Git history and current repository materials.",
-    "removed_material": "Removed corporate presentation template, including binary assets.",
-    "audit_entry": "Anonymized as removed-presentation-template; original decisions and counts preserved.",
-    "historical_catalogs": "Regenerated with scripts/catalog.py after excluding the template.",
-    "retained_skill_packages": "Unchanged: 27 packages, 277 files.",
-    "commit_references": "Updated for the rewritten history; installed package fingerprints are unchanged.",
-    "publication": {
-      "completed_on": "2026-10-07",
-      "public_repository": "https://github.com/finnetrolle/skillset",
-      "private_archive": "https://github.com/finnetrolle/skillset-private-archive",
-      "method": "Created a separate public repository with the sanitized history; renamed the original repository and retained its private visibility.",
-      "github_actions_enabled": false,
-      "anonymous_access": "Public repository and README accessible; historical cached objects belong to the separate private archive."
-    }
+    "public_repository": "https://github.com/finnetrolle/skillset",
+    "github_actions_enabled": false
   }
 }
