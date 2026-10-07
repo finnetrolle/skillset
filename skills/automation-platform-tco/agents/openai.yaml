@@ -1,4 +1,0 @@
-interface:
-  display_name: "Automation Platform TCO"
-  short_description: "TCO interview and Russian PDF for platform pilots"
-  default_prompt: "Use $automation-platform-tco to estimate TCO and generate a Russian PDF for an internal automation or AI platform pilot."

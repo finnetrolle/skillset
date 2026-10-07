@@ -18,19 +18,17 @@
         "domain-modeling": "skills/engineering/domain-modeling",
         "writing-for-agents": "skills/productivity/writing-for-agents"
       }
+    },
+    "openai": {
+      "repository": "https://github.com/openai/skills.git",
+      "revision": "49f948faa9258a0c61caceaf225e179651397431",
+      "license": "Apache-2.0",
+      "skill_paths": {
+        "security-best-practices": "skills/.curated/security-best-practices"
+      }
     }
   },
   "skills": {
-    "analyze-pitest": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/analyze-pitest",
-      "baseline_files": {
-        "SKILL.md": {
-          "sha256": "9681b7348ff179cbd62b8099afeea0189dff65c290ee7ada265415cc7cc81d08",
-          "executable": false
-        }
-      }
-    },
     "analyze-via-sonar": {
       "origin": "local",
       "imported_from": "~/.agents/skills/analyze-via-sonar",
@@ -53,32 +51,6 @@
       "dependencies": [
         "epic-to-issues"
       ]
-    },
-    "automation-platform-tco": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/automation-platform-tco",
-      "baseline_files": {
-        "SKILL.md": {
-          "sha256": "9328f295ec4a970fb0ab07c92fb853f99e05d90ef8f78b6818517527ffaecf78",
-          "executable": false
-        },
-        "agents/openai.yaml": {
-          "sha256": "5ef0aa7a31459aa5cc9afb5c6a7880a4f798062ad0acb48ef27fa0afcbc683ac",
-          "executable": false
-        },
-        "references/config-schema.md": {
-          "sha256": "3b5c967fbb1f30aa62d75393ebbfe8b51ae0855faa1d5d687d3b7a000cf3f553",
-          "executable": false
-        },
-        "references/interview-checklist.md": {
-          "sha256": "11324f570273988b4385442ae7172a15de60f11b702b78027e144de4fef09f2f",
-          "executable": false
-        },
-        "scripts/generate_tco_pdf.py": {
-          "sha256": "0f8e35d68730a9fbb0a8e8cea04464038bc81713e7ea2732154324ccdf9351fa",
-          "executable": false
-        }
-      }
     },
     "axi": {
       "origin": "local",
@@ -132,66 +104,6 @@
         }
       }
     },
-    "caveman-compress": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/caveman-compress",
-      "baseline_files": {
-        "README.md": {
-          "sha256": "dd772fc8791ea5bd6041e441f91ff355392d4f30c9f56310be7f4bc6cdaf5126",
-          "executable": false
-        },
-        "SECURITY.md": {
-          "sha256": "ac3432493cfe71368a141f437bf35562eb8f4ce07ae699e5399c0cb665e02da3",
-          "executable": false
-        },
-        "SKILL.md": {
-          "sha256": "8b0d64c622d8a70411bbd86e736ac23cc0465fca1943a37f081e58e9d3afd210",
-          "executable": false
-        },
-        "scripts/__init__.py": {
-          "sha256": "429c3e1c5cc5b9705f28d77f303c728304ae68693913ad3d5ce9b5a44c8ee40f",
-          "executable": false
-        },
-        "scripts/__main__.py": {
-          "sha256": "6d8b7d7846a845059d7a3107143f11131f63c5511d669b44085b15ec5e3d2279",
-          "executable": false
-        },
-        "scripts/benchmark.py": {
-          "sha256": "84a5a94bebcce03c9dc4a70333f120f03e11075bce9298e1e74b95594e142d43",
-          "executable": false
-        },
-        "scripts/cli.py": {
-          "sha256": "17edb6b425adc0ea04e35f1e90dfe318ba4232a1b815c5ff7d6cff7d574efea6",
-          "executable": false
-        },
-        "scripts/compress.py": {
-          "sha256": "9537671f5b8bf81bfe99078666948a93b5a5f1ae07d2f7bc3f085fe1a6b408c0",
-          "executable": false
-        },
-        "scripts/detect.py": {
-          "sha256": "46bb2b3092c2896eec023135495923701716c586b370976f244674342dd9a35e",
-          "executable": false
-        },
-        "scripts/validate.py": {
-          "sha256": "8b9e752b70868f6e03b3d7e76de19dd6b4ac92dad50522992738340e9916dc0d",
-          "executable": false
-        }
-      }
-    },
-    "caveman-help": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/caveman-help",
-      "baseline_files": {
-        "README.md": {
-          "sha256": "5fcfa700fbf6c07259db74bc6bb602f4590623c86b754b153061cf82b59c48ee",
-          "executable": false
-        },
-        "SKILL.md": {
-          "sha256": "590d6c6c17254bda56d18da7cc9d0bf252aeec5d1c78b77dd7ae4cabb8404f89",
-          "executable": false
-        }
-      }
-    },
     "caveman-review": {
       "origin": "local",
       "imported_from": "~/.agents/skills/caveman-review",
@@ -202,20 +114,6 @@
         },
         "SKILL.md": {
           "sha256": "9ef09065f26b9781275b5a4775e14870e331fab833efb2a2aa33f3205a2b83c3",
-          "executable": false
-        }
-      }
-    },
-    "caveman-stats": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/caveman-stats",
-      "baseline_files": {
-        "README.md": {
-          "sha256": "64d206ee7524625a8541ec064e0c7ec27c3764bae63b685cb5eecbd20aa76bdc",
-          "executable": false
-        },
-        "SKILL.md": {
-          "sha256": "b9e49e46ede956e0c1633eae82a695c996f728bc48f3903f001d301068a2b0ea",
           "executable": false
         }
       }
@@ -244,45 +142,10 @@
           "sha256": "f31acdc68a7e76c79f6c8335c7a8f43b41ab5706e41355516241029f8798b79e",
           "executable": false
         }
-      }
-    },
-    "find-skills": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/find-skills",
-      "baseline_files": {
-        "SKILL.md": {
-          "sha256": "1e85f6f9686e145aca4a124e3b704b9bbea9aa87e08515c1e352eee70f6e6e7a",
-          "executable": false
-        }
-      }
-    },
-    "fix-sonar-problems": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/fix-sonar-problems",
-      "baseline_files": {
-        "SKILL.md": {
-          "sha256": "4fceed8c024416fd8b90a19a05a4a4a67c0278c9f87a61cc013ac7743b63399f",
-          "executable": false
-        }
-      }
-    },
-    "frontend-skill": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/frontend-skill",
-      "baseline_files": {
-        "LICENSE.txt": {
-          "sha256": "b87a529a13d5294f97bb847936a82f39e4f8adae2425a3a5fb5f1a7b75d43e6a",
-          "executable": false
-        },
-        "SKILL.md": {
-          "sha256": "d367b2d22825d74c169475507e7ff109b81c1e9c20b2de3421fb19fcfbe3329b",
-          "executable": false
-        },
-        "agents/openai.yaml": {
-          "sha256": "e12288464311eeedcec370bf7625081b3bfb429ffe4c5d34acc9cf4bfd89db79",
-          "executable": false
-        }
-      }
+      },
+      "dependencies": [
+        "issue-dialogue"
+      ]
     },
     "github-ai-trending-pdf": {
       "origin": "local",
@@ -332,118 +195,8 @@
         "domain-modeling"
       ]
     },
-    "kdoc": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/kdoc",
-      "baseline_files": {
-        "SKILL.md": {
-          "sha256": "c4a28ffa32c2d92d88fc7abc4510716dbbc74a3d8349e7ff16519dd97f18a8a2",
-          "executable": false
-        }
-      }
-    },
-    "landing-redline": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/landing-redline",
-      "baseline_files": {
-        "SKILL.md": {
-          "sha256": "ebcac57274d78c31231a60c92d8c1bb9165ef1767aec7bbb087943ec08d26faa",
-          "executable": false
-        },
-        "agents/openai.yaml": {
-          "sha256": "e201b1e3ef30bdf917e508d5d65e4d39278b1af1a1345a3bcc77e5843ce49a04",
-          "executable": false
-        },
-        "references/audit-rubric.md": {
-          "sha256": "a9b818007980214094115e26be1d43f6d7305c600f0a5c34c1ca4c2d1a41e11e",
-          "executable": false
-        },
-        "references/output-format.md": {
-          "sha256": "d09ac57c4fdeea0887b7f2bb531f6e9501ebd199e659122717c061f08f248d31",
-          "executable": false
-        },
-        "references/rewrite-patterns.md": {
-          "sha256": "271c7971c31f8312f980d165f73416755ea62854c8ff30444e0e56cb3dceaada",
-          "executable": false
-        }
-      }
-    },
-    "lavish": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/lavish",
-      "baseline_files": {
-        "SKILL.md": {
-          "sha256": "885b01e4315c2575555a2f3233df1de1246ee0f7cb900e215eb9c3d128bf7507",
-          "executable": false
-        }
-      }
-    },
-    "pdf": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/pdf",
-      "baseline_files": {
-        "LICENSE.txt": {
-          "sha256": "4dd13869245e356246a5b770723247bbb80a8f07a181d1d3d873a1734297cdb9",
-          "executable": false
-        },
-        "SKILL.md": {
-          "sha256": "d108cf2b36355ab37eb5962933f4d09785ec002f3105c506129320209306b9d2",
-          "executable": false
-        },
-        "agents/openai.yaml": {
-          "sha256": "f8b223e25343559f57e1839ccd849fd1494a9729da33da04bb5074b7f80f4887",
-          "executable": false
-        },
-        "assets/pdf.png": {
-          "sha256": "17da356d195d4e3fa24f9becbee6b8d9e60e13005762b5ab0809c520c76da6ee",
-          "executable": false
-        }
-      }
-    },
-    "playwright": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/playwright",
-      "baseline_files": {
-        "LICENSE.txt": {
-          "sha256": "9a7110fc2d2f964038e5dc49128f908f29f47a574c961cba16085914e879cbda",
-          "executable": false
-        },
-        "NOTICE.txt": {
-          "sha256": "417d5d3372914ecfd9fe102ac1d7dc2119253209f9718d6c222f616876c1904b",
-          "executable": false
-        },
-        "SKILL.md": {
-          "sha256": "61a9b4ab518cd902095071ea3d48f631ff9b294dc290965c6979356a050a9c83",
-          "executable": false
-        },
-        "agents/openai.yaml": {
-          "sha256": "ddda43720fc566fffa45264be8f17f7745a3cee28d5245d41d3b963bc9967230",
-          "executable": false
-        },
-        "assets/playwright-small.svg": {
-          "sha256": "f1d213c0f76735d8272c3d3e9fbf71fe7b894e2d1588907044c780f2c33a9732",
-          "executable": false
-        },
-        "assets/playwright.png": {
-          "sha256": "521669f088c838196c6c852ccc9abdd7234d8f37fc9a8a7a9af7db2d50193381",
-          "executable": false
-        },
-        "references/cli.md": {
-          "sha256": "c6960cb500ebc0e63eb08485a56e27713baa783a39e8afe8fcf06cab3bef16be",
-          "executable": false
-        },
-        "references/workflows.md": {
-          "sha256": "a2b5835a00ebee3906c146adf7f764f7718ea3f89a8702d86eaa135dfe0fc8c2",
-          "executable": false
-        },
-        "scripts/playwright_cli.sh": {
-          "sha256": "aa3fdff5d0e4556177f4dfd5f04117e772aa54f94b6a2e34b6c0edf629c6b9b5",
-          "executable": true
-        }
-      }
-    },
     "security-best-practices": {
-      "origin": "local",
+      "origin": "openai",
       "imported_from": "~/.agents/skills/security-best-practices",
       "baseline_files": {
         "LICENSE.txt": {
@@ -498,63 +251,9 @@
           "sha256": "9606d69190c04c167fdeac57e61297547a57b0542fd89dede36f355970446929",
           "executable": false
         }
-      }
-    },
-    "sync-agent-skills": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/sync-agent-skills",
-      "baseline_files": {
-        "SKILL.md": {
-          "sha256": "e1937b8401812813ae7ad0d8b2cb6c9f7eb93f97f0f0e75ae908baee47f1f101",
-          "executable": false
-        },
-        "agents/openai.yaml": {
-          "sha256": "5ab745cc27e0fd53fbd0274de408406819498254366cf91a137a625cbcc1bc5f",
-          "executable": false
-        },
-        "references/compatibility.md": {
-          "sha256": "ce90ef47b64374f139aa90b9e4afbf4d63a51361e19b32f7ee7f3ce183131f81",
-          "executable": false
-        },
-        "scripts/skill_inventory.py": {
-          "sha256": "ad569362fdd483650e7971a7c0079d21929eb8f3edb57a231055a18da6c4c94a",
-          "executable": true
-        },
-        "scripts/test_skill_inventory.py": {
-          "sha256": "df01286539b26b90eeb0898cf541836e703ccb0fccb8e365485d5d52bfdff19f",
-          "executable": true
-        }
-      }
-    },
-    "tailor-cv-to-vacancy": {
-      "origin": "local",
-      "imported_from": "~/.agents/skills/tailor-cv-to-vacancy",
-      "baseline_files": {
-        "SKILL.md": {
-          "sha256": "51f4241680e95983bdde453b12ed9094ab569bec449958a8ce81bf8a2ef26be7",
-          "executable": false
-        },
-        "agents/openai.yaml": {
-          "sha256": "e5a249cade3c5a5ff575d4eeedc56e3210c579aafb03c128caefe84296a30c35",
-          "executable": false
-        },
-        "references/cv-schema.md": {
-          "sha256": "352a9dd4cf951a346164e8277dd4e9dfa1dc66b3981f781ecda04891bf1f5ad7",
-          "executable": false
-        },
-        "scripts/extract_document.py": {
-          "sha256": "af9f35f24a45bbd4c367bba6b6c860ff7ca19b89df2e4709a467bc2ca176b2b6",
-          "executable": true
-        },
-        "scripts/render_cv.py": {
-          "sha256": "32448f8318fd32196220fc4a468d7c0938568ae4a8ca526e56a266e241af13a5",
-          "executable": true
-        },
-        "scripts/validate_cv.py": {
-          "sha256": "86a03ba7845f20b4052ccfbe0203f544e203e11d5637d11d913b7de379f7b586",
-          "executable": true
-        }
-      }
+      },
+      "upstream_source": "openai",
+      "upstream_path": "skills/.curated/security-best-practices"
     },
     "two-axis-review": {
       "origin": "local",
@@ -1487,20 +1186,6 @@
       "dependencies": [
         "caveman"
       ]
-    },
-    "platform-release-notes": {
-      "origin": "local",
-      "imported_from": "~/.codex/skills/platform-release-notes",
-      "baseline_files": {
-        "SKILL.md": {
-          "sha256": "c04c1a093dd4d8c3e70dc1df6f0a531599090c4ca3d9f87dff430b1bbfa50cc4",
-          "executable": false
-        },
-        "agents/openai.yaml": {
-          "sha256": "dccd0cdbd6a474232c4906e49029f0d64332803ba30c0424f3430ca3a0b5c7ed",
-          "executable": false
-        }
-      }
     },
     "skill-usage-report": {
       "origin": "local",

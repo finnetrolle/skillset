@@ -39,6 +39,26 @@ Check these dimensions:
 
 For retrying failed work, also identify what prevents the same failure recurring.
 
+## Show interview progress
+
+Before each next question, show a short progress line in the user's language,
+including when using an input tool. For example:
+
+```text
+Отвечено: 3; осталось примерно 4 вопроса (включая текущий).
+```
+
+Count distinct questions answered in this interview using the available history;
+unanswered or skipped questions do not increase the count. Estimate the remaining
+questions from the whole known decision tree, including the current question and
+branches whose prerequisites are pending, rather than only the ready frontier.
+Update after each answer; new branches or answers covering several decisions can
+change the estimate. Briefly explain material changes.
+
+When a useful estimate is unavailable, show the answered count and say the
+remainder is not yet estimated. The counter describes progress, not ambiguity or
+a question quota; completion still depends on clarity and the user's early exit.
+
 ## Close and hand off
 
 Use freeform mode for exploration, spec mode for a full specification and ticket

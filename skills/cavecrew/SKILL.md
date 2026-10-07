@@ -1,82 +1,94 @@
 ---
 name: cavecrew
-description: >
-  Decision guide for delegating to caveman-style subagents. Tells the main
-  thread WHEN to spawn `cavecrew-investigator` (locate code), `cavecrew-builder`
-  (1-2 file edit), or `cavecrew-reviewer` (diff review) instead of doing the
-  work inline or using vanilla `Explore`. Subagent output is caveman-compressed
-  so the tool-result injected back into main context is ~60% smaller — main
-  context lasts longer across long sessions.
-  Trigger: "delegate to subagent", "use cavecrew", "spawn investigator/builder/reviewer",
-  "save context", "compressed agent output".
+description: >-
+  Choose and brief subagents for code investigation, bounded 1-2 file edits,
+  and focused review with compact, evidence-bearing results. Includes portable
+  investigator, builder and reviewer role instructions for the host's available
+  delegation tools. Use for "delegate to subagent", "use cavecrew",
+  "spawn investigator/builder/reviewer", "save context", or "compressed agent output".
 ---
 
-Cavecrew = three subagent presets that emit caveman output. Same job as Anthropic defaults (`Explore`, edit-style agents, reviewer); difference is the tool-result they return is compressed, so main context shrinks per delegation.
+# Cavecrew
 
-## When to use cavecrew vs alternatives
+Delegate bounded work and return short results that preserve evidence,
+uncertainty and verification status. Roles are included in this package;
+`cavecrew-*` names are role labels, not assumed installed agent types.
 
-| Task | Use |
+## Choose the role
+
+| Task | Route |
 |---|---|
-| "Where is X defined / what calls Y / list uses of Z" | `cavecrew-investigator` |
-| Same but you also want suggestions/architecture commentary | `Explore` (vanilla) |
-| Surgical edit, ≤2 files, scope obvious | `cavecrew-builder` |
-| New feature / 3+ files / cross-cutting refactor | Main thread or `feature-dev:code-architect` |
-| Review diff, branch, or file for bugs | `cavecrew-reviewer` |
-| Deep code review with rationale + alternatives | `Code Reviewer` (vanilla) |
-| One-line answer you already know | Main thread, no subagent |
+| Locate definitions, callers, uses or tests | [investigator](references/investigator.md), read-only |
+| A clear edit in 1-2 known project files | [builder](references/builder.md) |
+| Find actionable bugs/risks in a diff, branch or specified files | [reviewer](references/reviewer.md), read-only |
+| Already-known one-line answer | Answer directly |
+| New feature, 3+ file edit, cross-cutting refactor | Main thread or a general agent with adequate scope |
+| Architecture options or a deep explanation | Main thread or a general agent; request the necessary rationale |
 
-Rule of thumb: **if you'd want the subagent's output in 1/3 the tokens, pick cavecrew. If you'd want prose, pick vanilla.**
+A short report is the goal, not a fixed token reduction. Do not claim measured
+savings without actual comparable measurements.
 
-## Why this exists (the real win)
+## Use the host's available delegation
 
-Subagent tool results get injected into main context verbatim. A vanilla `Explore` that returns 2k tokens of prose costs 2k tokens of main-context budget every time. The same finding from `cavecrew-investigator` returns ~700 tokens. Across 20 delegations in one session that's the difference between context exhaustion and finishing the task.
+1. Check the tools actually exposed in the current session and applicable
+   delegation rules. Use Codex or Claude Code's available agent mechanism;
+   do not invent a tool, registered preset or model name.
+2. Read the selected role and its [shared contract](references/shared.md).
+   If an existing named preset is available, use it only when its instructions
+   meet this role's contract. Otherwise give a general agent the role instructions
+   as its assignment. A label such as `cavecrew-builder` may name the task; pass
+   it as an agent type only if that type is actually registered.
+3. Give the worker the concrete objective, repository/working directory, allowed
+   files and mutations, relevant requirements, raw artifacts, and the expected
+   result. State whether the workspace is shared or isolated. If the worker
+   can read this package, point to the absolute selected role path; otherwise
+   include the role and shared contract text in its prompt.
+4. Inherit the current/default model settings unless an explicit user choice or
+   applicable instruction calls for an available override. This package requires
+   no Claude plugin hooks, frontmatter patching or `CAVECREW_*_MODEL` variables.
+5. Wait for completion using the host's available mechanism. Reuse a worker
+   when appropriate. Inspect the result and any changed files before handoff.
 
-## Output contracts
+When delegation is unavailable or disallowed, do the scoped work inline using
+its role contract and tell the user if that affects the requested outcome.
+Do not require installation of another agent package just to use these roles.
 
-What main thread can rely on per agent:
+## Task brief
 
-**`cavecrew-investigator`**
+Include only context that changes the worker's decisions:
+
+```text
+Role: <absolute role-reference path, or included role + shared instructions>
+Task: <concrete result>
+Workspace: <absolute directory; shared or isolated>
+Scope: <files, symbols, diff/base revision; permitted mutations>
+Requirements: <user contract and applicable project rules>
+Evidence: <raw inputs, reproduction or observations; known limitations>
+Return: <role output contract; verification and unresolved matters>
 ```
-<Header>:
-- path:line — `symbol` — short note
-totals: <counts>.
-```
-Or `No match.` Always file-path-first, line-number-attached, backticked symbols. Safe to grep with `path:\d+`.
 
-**`cavecrew-builder`**
-```
-<path:line-range> — <change ≤10 words>.
-verified: <re-read OK | mismatch @ path:line>.
-```
-Or one of: `too-big.` / `needs-confirm.` / `ambiguous.` / `regressed.` (terminal first token).
+For an independent review, supply requirements and raw changes rather than an
+expected verdict. Do not steer the reviewer toward the builder's conclusions.
 
-**`cavecrew-reviewer`**
-```
-path:line: <emoji> <severity>: <problem>. <fix>.
-totals: N🔴 N🟡 N🔵 N❓
-```
-Or `No issues.` Findings sorted file → line ascending.
+## Chains and parallel work
 
-## Chaining patterns
+- Locate -> edit -> review: investigator identifies sites, main thread chooses
+  1-2 files, builder changes them, reviewer inspects the actual resulting diff.
+- Known site: brief the builder directly when discovery is unnecessary.
+- Broad read-only investigation: use 2-3 scouts on distinct questions when
+  delegation is permitted and the work benefits from parallel execution.
 
-**Locate → fix → verify** (most common):
-1. `cavecrew-investigator` returns site list.
-2. Main thread picks 1-2 sites, hands paths to `cavecrew-builder`.
-3. `cavecrew-reviewer` audits the diff.
+Assign one writer to each shared file. Independent readers can run in parallel;
+wait for an edit to finish before reviewing its resulting diff. Do not split a
+coupled 5-file change into builders just to bypass the builder's scope limit.
 
-**Parallel scout** (when investigation is broad):
-Spawn 2-3 `cavecrew-investigator` calls in one message (different angles: defs vs callers vs tests). Aggregate in main thread.
+## Main-thread handoff
 
-**Single-shot edit** (when site is already known):
-Skip investigator. Hand exact path:line to `cavecrew-builder` directly.
+Keep worker findings traceable to files/lines and relevant observations. Preserve
+unanswered questions, partial results and failed or skipped checks. Re-reading
+changed text is not a passing build, test or behavioral verification.
 
-## What NOT to do
-
-- Don't use `cavecrew-builder` when you don't already know the file. Spawn investigator first or main thread will eat tokens passing context.
-- Don't chain `cavecrew-investigator → cavecrew-builder` for a 5-file refactor. Builder will return `too-big.` and you'll have wasted a turn.
-- Don't ask `cavecrew-reviewer` for "general feedback" — it returns findings only, no architecture opinions. Use `Code Reviewer` for that.
-- Don't expect prose. Cavecrew output is structured, sometimes terse to the point of cryptic. If a human will read it directly, paraphrase.
-
-## Auto-clarity (inherited)
-
-Subagents drop caveman → normal English for security warnings, irreversible-action confirmations, and any output where fragment ambiguity could be misread. Resume caveman after.
+Explain cryptic fragments when presenting the result to the user. Expand beyond
+one line when security, architecture, irreversible actions or unfamiliar context
+need a rationale. Compression must not turn uncertain evidence into certainty
+or substitute for the requested depth of work.

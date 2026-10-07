@@ -1,4 +1,0 @@
-interface:
-  display_name: "Landing Redline"
-  short_description: "Audit landing pages, pressure-test copy, then propose edits"
-  default_prompt: "Use $landing-redline to audit this landing page, inventory all user-facing copy, and propose the highest-impact edits before changing code."

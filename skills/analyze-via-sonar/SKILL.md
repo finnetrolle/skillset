@@ -1,7 +1,7 @@
 ---
 name: analyze-via-sonar
 description: >-
-  Анализ проекта через локальный SonarQube в Docker с отчётом
+  Анализ текущего проекта через локальный или настроенный SonarQube с отчётом
   sonar_problems.md: место, причина и рекомендация по каждой проблеме.
   Использовать для "проанализируй через sonar", "проверь sonarqube",
   "analyze via sonar", при /analyze-via-sonar в Claude Code или
@@ -10,191 +10,162 @@ description: >-
 
 # Анализ проекта через SonarQube
 
-Задача: прогнать статический анализ проекта через локальный SonarQube Community (Docker) и собрать все проблемы (bugs, vulnerabilities, security hotspots, code smells) в файл `sonar_problems.md` в корне проекта.
+Прогнать статический анализ текущего проекта и собрать bugs, vulnerabilities,
+security hotspots и code smells в `sonar_problems.md` в его корне. Использовать
+инструменты и конфигурацию этого проекта; не предполагать конкретный язык,
+систему сборки, имя сервера или расположение секретов.
+
+## Шаг 0. Определить параметры текущего проекта
+
+Прочитать инструкции проекта и его Sonar/build-конфигурацию: например,
+`sonar-project.properties`, Gradle-файлы, `pom.xml`, package scripts, Compose
+или документированную команду анализа.
+
+Составить короткую рабочую конфигурацию без значений секретов:
+
+| Параметр | Как определить |
+|---|---|
+| Корень и scope | Текущий репозиторий, выбранные пользователем модули; исключения и тестовые пути из конфигурации. |
+| `SONAR_HOST_URL` | Явный выбор пользователя, затем действующая конфигурация/окружение. Учесть существующий alias `SONAR_URL`. |
+| `SONAR_PROJECT_KEY` | Эффективный `sonar.projectKey` выбранного scanner/build, включая вычисляемые значения. |
+| `SONAR_PROJECT_NAME` | Эффективное имя из scanner или существующего проекта на сервере, включая его default. Только для нового проекта без имени - имя репозитория. |
+| Scanner и prerequisites | Команда, версия, JDK/runtime, build/test/coverage из проекта. |
+| Ветка/PR | Эффективный контекст анализа, только если поддержан сервером и scanner. |
+| Доступ | Имеющийся `SONAR_TOKEN` или указанный проектом источник секретов. |
+| Локальный сервер | Существующая Compose service/контейнер, URL, image и volumes, если они настроены. |
+
+Явные параметры пользователя имеют приоритет. Если остальные источники
+противоречат друг другу, выяснить, какой сервер и проект нужны, до запуска.
+Не заменять уже настроенный project key новым именем репозитория.
+
+При отсутствии настройки сервера предложить локальный SonarQube Community.
+Для нового локального проекта получить стабильный допустимый ключ из Git
+owner/repository; без remote использовать имя корня и проверить отсутствие
+коллизии. Сообщить выбранные key и URL. На существующем сервере неизвестный key
+уточнить, а не создавать второй проект наугад. Поддержка языка зависит от
+серверных анализаторов; неподдерживаемый язык отметить явно.
 
 ## Шаг 1. Проверить/поднять SonarQube
 
-```bash
-docker ps --filter name=vigilant-sonar --format '{{.Names}}'
-```
+Прочитать [references/server-and-access.md](references/server-and-access.md):
+проверка выбранного сервера и, только для локального режима, запуск Docker.
+Работающий настроенный сервер переиспользовать. Его сбой или ошибка доступа
+не являются основанием создавать новый сервер, сбрасывать данные или менять
+версию. Записать фактическую версию сервера для отчёта.
 
-Сначала проверить доступность Docker daemon через `docker info` с внешним
-timeout 10 секунд; зависший CLI завершить и считать infrastructure failure. Если контейнер
-существует, но остановлен, запустить `docker start vigilant-sonar`. Только если
-контейнера ещё нет, создать его:
+## Шаг 2. Получить доступ
 
-```bash
-docker run -d --name vigilant-sonar -p 127.0.0.1:9000:9000 \
-  sonarqube:26.8.0.126808-community
-```
+Следовать разделу доступа в том же справочнике. Переиспользовать действующий
+токен. Для анализа нужны Execute Analysis, для чтения результатов - Browse
+и права на требуемые API. Валидный токен сам по себе не доказывает эти права.
+Секреты не выводить, не включать в отчёт или Git.
 
-- Порт 9000 доступен только через loopback. У свежего сервера пароль admin/admin
-  по умолчанию - это допустимо только для одноразового локального контейнера.
-- Ждать готовности: в SonarQube 26.x состояние `UP`, а не `GREEN`:
+## Шаг 3. Проверить настройку scanner
 
-```bash
-curl -s http://localhost:9000/api/system/status   # {"status":"UP"}
-```
+Прочитать [references/scanners.md](references/scanners.md) и выбрать маршрут
+по реальной конфигурации проекта. Сохранить установленную версию плагина,
+scope, пути coverage и SCM-настройки. Проверить prerequisite-команды, вместо
+того чтобы считать, что scanner сам запустит сборку и тесты.
 
-Старт занимает 1-3 минуты.
+Если scanner или обязательная конфигурация отсутствуют, определить минимально
+необходимую настройку и недостающие параметры. Установка инструментов или
+правка build-файлов выполняются только в согласованном объёме; обычный запрос
+анализа не разрешает менять build-политику или обновлять зависимости.
 
-## Шаг 2. Токен
+## Шаг 4. Прогнать анализ и дождаться свежего результата
 
-Авторизация для генерации токена - basic auth `admin:<пароль>`. Пароль админа лежит в gitignored-файле `.claude/sonar.env` (переменная `SONAR_ADMIN_PASSWORD`); SonarQube принудительно требует смену пароля при первом входе в web UI, и смена переживает перезапуск контейнера (данные живут внутри контейнера без volume).
+Выполнить проектные build/test/coverage-команды, затем выбранный scanner.
+Обязательный prerequisite, который не прошёл, означает незавершённый анализ.
+Отсутствующий необязательный coverage report отметить как ограничение;
+отсутствие покрытия не выдавать за измеренные 0%.
 
-Порядок:
+Взять путь `report-task.txt` из фактического scanner output/настроек. Типичные
+пути перечислены в справочнике scanners. До запуска запомнить прежний task ID;
+после успешного scanner проверить, что metadata произведены этим запуском,
+а `projectKey` совпадает с выбранным. Старый файл после сбоя не использовать.
 
-Сначала ограничить права файла и прочитать только ожидаемые ключи. Не делать
-`source .claude/sonar.env`: env-файл с секретами не должен исполняться как
-shell-код. Этот блок выполнить один раз в том же shell, где пойдут команды
-ниже:
+Проверить соответствие `serverUrl`/`ceTaskUrl` выбранному серверу, прежде чем
+отправлять секреты. Если внешний URL отличается из-за прокси, использовать
+`ceTaskId` с уже выбранным `SONAR_HOST_URL`, подтвердив соответствие сервера.
+Опросить эту CE task до `SUCCESS` с конечным общим timeout, по умолчанию
+180 секунд. Сохранить её `analysisId`. `FAILED`, `CANCELED`, отсутствие свежих
+metadata или timeout - infrastructure failure; старые API-данные не подставлять.
 
-```bash
-chmod 600 .claude/sonar.env
-sonar_env_value() {
-  local key="$1" value
-  value="$(awk -v key="$key" '
-    index($0, key "=") == 1 { value = substr($0, length(key) + 2) }
-    END { print value }
-  ' .claude/sonar.env)"
-  if [[ "$value" == \'*\' || "$value" == \"*\" ]]; then
-    value="${value:1:${#value}-2}"
-  fi
-  printf '%s' "$value"
-}
-SONAR_ADMIN_PASSWORD="$(sonar_env_value SONAR_ADMIN_PASSWORD)"
-SONAR_TOKEN="$(sonar_env_value SONAR_TOKEN)"
-```
-
-1. Если в `.claude/sonar.env` уже есть переменная `SONAR_TOKEN` - проверить её валидность и при успехе использовать без revoke/generate:
-
-```bash
-curl -fsS --connect-timeout 5 --max-time 15 -u "$SONAR_TOKEN:" \
-  'http://localhost:9000/api/authentication/validate'
-# {"valid":true} = токен жив; false = удалить только строку SONAR_TOKEN и продолжить
-```
-
-2. Отозвать токен прошлой сессии, если он существует (значение не персистится - повторная генерация с тем же именем без отзыва падает с `already exists`):
-
-```bash
-curl -sS --connect-timeout 5 --max-time 15 -o /dev/null -w '%{http_code}\n' \
-  -u "admin:$SONAR_ADMIN_PASSWORD" -X POST \
-  'http://localhost:9000/api/user_tokens/revoke?name=vigilant-local-analysis'
-# 204 = отозван (тело пустое), 404 = не существовал; оба варианта нормальны
-```
-
-3. Сгенерировать свежий токен, прочитать поле `token` (`squ_...`) из ответа и сразу дописать строку `SONAR_TOKEN='<значение>'` в `.claude/sonar.env` (gitignored), чтобы следующая сессия переиспользовала его по шагу 1:
-
-```bash
-curl -fsS --connect-timeout 5 --max-time 30 \
-  -u "admin:$SONAR_ADMIN_PASSWORD" -X POST \
-  'http://localhost:9000/api/user_tokens/generate?name=vigilant-local-analysis'
-```
-
-4. Если 401: файл `.claude/sonar.env` отсутствует или пароль устарел. НЕ пересоздавать контейнер (сотрёт историю проекта в SonarQube) и не подбирать пароль. Спросить у пользователя актуальный пароль админа, записать его в `.claude/sonar.env` (файл gitignored; сам пароль в SKILL.md и другие файлы репозитория не писать) и повторить команды.
-
-Токен хранить только в `.claude/sonar.env`; в файлы репозитория не записывать. Последующие API-вызовы (шаг 5) идут с токеном, а не с паролем - смена пароля на них не влияет.
-
-Особенность curl: авторизация токеном требует двоеточия после него, иначе curl спросит пароль интерактивно: `curl -u "$TOKEN:" ...`.
-
-## Шаг 3. Gradle-настройка
-
-В `build.gradle.kts` уже подключено. Проверить настройки; при расхождении
-остановиться и доложить, а не менять build-конфигурацию в рамках анализа:
-
-- плагин `id("org.sonarqube") version "7.4.0.8496"`;
-- блок `sonar` со свойствами: `sonar.projectKey=io.vigilant:vigilant`,
-  `sonar.projectName=vigilant`,
-  `sonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml`,
-  `sonar.scm.disabled=true` (pipeline сам определяет scope через Git, а не через
-  SCM-сенсор SonarQube).
-
-`sonar.coverage.jacoco.xmlReportPaths` указывать строкой-литералом: передача Gradle `Provider` превращается в `map(...)` и SonarQube её не распознаёт.
-
-## Шаг 4. Прогнать анализ
-
-Токен передавать через переменную окружения `SONAR_TOKEN`:
-
-```bash
-SONAR_TOKEN="$SONAR_TOKEN" ./gradlew test jacocoTestReport sonar \
-  -Dsonar.host.url=http://localhost:9000
-```
-
-- Допустим и `-Dsonar.token=<TOKEN>` в командной строке: проверено 2026-08-21 на плагине 7.4.0.8496 + SonarQube 26.8 - анализ загружается (`analysisDate` в `api/project_branches/list` обновляется). Ранее фиксировался 401 на `GET /api/v2/analysis/version`; если он воспроизведётся - вернуться к `SONAR_TOKEN`.
-- Тесты + JaCoCo обязательны до `sonar`, иначе отчёт покрытия не попадёт в анализ. Первый запуск скачивает плагин, повторные занимают секунды. При неизменённых входах задачи Gradle уходят в `UP-TO-DATE` (кроме самого `sonar`) - это нормально, форсировать перезапуск не нужно.
-
-После Gradle не читать API проекта сразу: загрузка анализа асинхронна. Взять
-`ceTaskUrl` и `projectKey` из `build/sonar/report-task.txt`, проверить, что
-project key равен `io.vigilant:vigilant`, и опрашивать `ceTaskUrl` с токеном до
-`SUCCESS`. `FAILED`, `CANCELED`, отсутствие файла или timeout 180 секунд -
-infrastructure failure; старые API-данные не использовать.
+Quality gate запрашивать для полученного `analysisId`. Метрики и findings
+читать в выбранном project/branch/PR контексте. Если другой анализ успел
+заменить этот snapshot, не приписывать его результаты своему запуску:
+согласовать последовательный прогон или явно сообщить ограничение.
 
 ## Шаг 5. Собрать результаты через API
 
-Использовать загруженный `$SONAR_TOKEN` и следить за экранированием: в
-query-параметрах `componentKeys`/`component` ключ проекта -
-`io.vigilant%3Avigilant`. Все запросы выполнять с `--connect-timeout 5`,
-`--max-time 30`, `--fail-with-body` и проверять JSON через `jq -e`.
-
-1. Quality gate:
+Проверить доступные endpoints и поля в `/web_api` выбранного сервера;
+Web API различается между версиями. Все запросы ограничивать timeout,
+проверять HTTP status и JSON-схему ответа. Например, для совместимого API:
 
 ```bash
 curl -sS --fail-with-body --connect-timeout 5 --max-time 30 \
-  -u "$SONAR_TOKEN:" 'http://localhost:9000/api/qualitygates/project_status?projectKey=io.vigilant%3Avigilant'
+  -H "Authorization: Bearer $SONAR_TOKEN" --get "${SONAR_HOST_URL%/}/api/issues/search" \
+  --data-urlencode "componentKeys=$SONAR_PROJECT_KEY" \
+  --data-urlencode 'resolved=false' \
+  --data-urlencode 'ps=500' --data-urlencode 'p=1'
 ```
 
-2. Метрики (в ответе имя метрики лежит в поле `metric`, значения - в `value` или `periods`):
+Это пример одной страницы. Добавлять branch/PR параметры по поддерживаемому
+API, если анализ выполнялся в таком контексте. Использовать `--data-urlencode`
+для всех значений параметров, включая key с двоеточиями. Для Gradle/Maven/CLI
+секретный token передавать через `SONAR_TOKEN`; у других scanners проверить
+поддержанный способ передачи в справочнике. В отчёте значения скрывать.
 
-```bash
-curl -sS --fail-with-body --connect-timeout 5 --max-time 30 \
-  -u "$SONAR_TOKEN:" 'http://localhost:9000/api/measures/component?component=io.vigilant%3Avigilant&metricKeys=bugs,vulnerabilities,security_hotspots,code_smells,coverage,duplicated_lines_density,ncloc,sqale_rating,reliability_rating,security_rating'
-```
+Собрать:
 
-3. Список проблем (важно: `ps=500` обязателен - без него лимит 100 и тишина усекает выдачу; если `total` больше числа полученных issues - добирать страницы параметром `&p=2`, `&p=3`, ...):
+1. **Quality gate**: `api/qualitygates/project_status` с `analysisId` этой CE task.
+2. **Метрики**: `api/measures/component` для текущего component/context.
+   Запрашивать поддерживаемые сервером bugs, vulnerabilities, security_hotspots,
+   code_smells, coverage, duplicated_lines_density, ncloc и ratings. Если модель
+   метрик версии изменилась, использовать документированный эквивалент.
+   Отсутствующее значение обозначать как недоступное, а не нулевое.
+3. **Issues**: `api/issues/search` для текущего project/context. Сохранять key,
+   type/категорию, severity/impacts, component, line, rule, message. Путь файла
+   брать из component metadata, сохраняя путь и модуль, а не только последний
+   сегмент после двоеточия.
+4. **Security hotspots**: `api/hotspots/search` отдельно от issues, даже при
+   нулевой метрике. Сохранять key, ruleKey, message, component, line,
+   vulnerabilityProbability, securityCategory, status. Не объявлять hotspot
+   подтверждённой уязвимостью без review.
+5. **Правила**: `api/rules/show` для фактического rule key каждой группы.
+   Читать `descriptionSections` (introduction, root_cause, how_to_fix,
+   resources); для версий с другой схемой использовать доступные поля
+   описания. HTML преобразовать в читаемый текст без потери примеров и ссылок.
 
-```bash
-curl -sS --fail-with-body --connect-timeout 5 --max-time 30 \
-  -u "$SONAR_TOKEN:" 'http://localhost:9000/api/issues/search?componentKeys=io.vigilant%3Avigilant&resolved=false&ps=500'
-```
-
-Из каждого issue брать: `type`, `severity`, `component` (последний сегмент после `:`), `line`, `rule`, `message`.
-
-4. Security hotspots: в `issues/search` они НЕ попадают - отдельный endpoint. Запрашивать всегда, даже если метрика `security_hotspots = 0` (метрика берётся из снапшота анализа и должна сходиться; расхождение - повод перепроверить):
-
-```bash
-curl -sS --fail-with-body --connect-timeout 5 --max-time 30 \
-  -u "$SONAR_TOKEN:" 'http://localhost:9000/api/hotspots/search?projectKey=io.vigilant%3Avigilant&ps=500'
-```
-
-Из каждого hotspot брать: `ruleKey`, `message`, `component`, `line`, `vulnerabilityProbability`, `securityCategory`, `status`. Для описания правила - тот же `api/rules/show` (шаг 5.5).
-
-5. Описание правила (важно: текст лежит в `descriptionSections`, поля `htmlDescription`/`mdDescription` пусты):
-
-```bash
-curl -sS --fail-with-body --connect-timeout 5 --max-time 30 \
-  -u "$SONAR_TOKEN:" 'http://localhost:9000/api/rules/show?key=kotlin%3AS6624'
-```
-
-Секции: `introduction`, `root_cause` (почему проблема), `how_to_fix` (рекомендация SonarQube), `resources` (CWE/OWASP/документация). HTML в `content` секций надо зачищать в текст.
+Для issues и hotspots собрать все страницы по `paging/total` ответа;
+использовать поддерживаемый максимум страницы, обычно `ps=500`. Проверять
+полноту. Лимит выдачи, отказ endpoint или ошибка страницы означают неполный
+отчёт; нельзя записывать «проблем нет» или затирать полный прежний реестр.
+Старый реестр сохранять до успешного получения и проверки всех данных.
 
 ## Шаг 6. Записать sonar_problems.md
 
 Файл `sonar_problems.md` в корне проекта, на русском. Структура:
 
-1. Шапка: дата анализа, версия сервера, ключ проекта, статус quality gate, итоговые счётчики.
+1. Шапка: дата анализа, URL и версия сервера, project key/name, branch/PR и scope, analysisId, scanner и выполненные команды без секретов, статус quality gate, метрики и ограничения.
 2. По каждой уникальной проблеме (группировать одинаковые правила по файлу в одну секцию с таблицей вхождений):
    - таблица метаданных: правило, название правила, тип, серьёзность, где (файл:строка);
    - дословное `message` от SonarQube;
    - **Что это** - пересказ introduction/root_cause своими словами;
    - **Почему это проблема** - риски из root_cause (для уязвимостей - CWE/OWASP классификации);
    - **Как SonarQube советует исправить** - из how_to_fix, включая примеры кода и команды; если у правила несколько вариантов - перечислить все и отметить рекомендуемый для этого проекта;
-   - ссылки из resources.
+   - ссылки из resources. Отдельно отмечать статус review для hotspots.
 3. Финальная сводная таблица: правило / тип / серьёзность / количество / файл.
 
 Если проблем 0: не выдумывать секции - шапка с метриками, строка "открытых проблем нет" и секция "История исправлений" с записью о прогоне (дата, что подтверждено, изменение метрик относительно прошлого прогона, если менялись). Существующую историю в файле сохранять.
 
 Требования к файлу: без длинных тире (только `-`), технические термины без искажений, команды и примеры кода в блоках.
 
+При неполном сборе дать отдельный диагностический отчёт с причиной и scope пропусков, сохранив прежний `sonar_problems.md`. Отсутствующие поля и описания не выдумывать.
+
 ## Шаг 7. Отчёт пользователю
 
-Кратко: статус quality gate, таблица метрик, список найденных проблем одной строкой на каждую, ссылка на `sonar_problems.md`, URL web UI (`http://localhost:9000`, проект "vigilant"). Отдельно предупреждать об уязвимостях и о дефолтном пароле админа, если контейнер поднимался в этом сеансе.
+Кратко: quality gate, таблица метрик, найденные проблемы, ограничения,
+ссылка на `sonar_problems.md` и фактический dashboard URL из scanner metadata.
+Отдельно отметить уязвимости и непроверенные hotspots. Предупредить о дефолтном
+пароле админа, только если свежий локальный сервер создан в этом сеансе.

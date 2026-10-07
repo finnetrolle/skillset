@@ -30,7 +30,8 @@ def render(root):
         if len(description) > 200:
             description = description[:197].rsplit(" ", 1)[0] + "…"
         observed = rows.get(name, {})
-        origin = "Matt Pocock, адаптирован" if record["origin"] == "mattpocock" else "Локальный снимок"
+        origin = {"mattpocock": "Matt Pocock, адаптирован", "openai": "OpenAI, первоисточник"}.get(
+            record["origin"], "Локальный снимок")
         deps = ", ".join(f"`{dep}`" for dep in record.get("dependencies", [])) or "-"
         lines.append(f"| [{name}](../skills/{name}/SKILL.md) | {observed.get('uses', 0)} | "
                      f"{observed.get('tasks', 0)} | {origin} | {deps} | {description} |")

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Release notes платформы"
-  short_description: "Краткие заметки о выпуске по всем репозиториям"
-  default_prompt: "Используй $platform-release-notes, чтобы собрать краткие release notes платформы на русском по всем её репозиториям, объединив указанные версии."

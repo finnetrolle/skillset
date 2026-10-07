@@ -20,9 +20,30 @@ Do not publish every mind-map leaf unchanged. A discovery branch often follows a
 
 Research is not automatically a separate issue. Keep reversible discovery inside the implementation issue unless it needs a different owner, has an independent deliverable, or blocks several branches.
 
+## Wide migrations
+
+Use expand, migrate, contract when many consumers share the changing contract:
+
+1. **Expand:** add the new form alongside the old. Specify the compatibility
+   promised to existing consumers and checks for both forms.
+2. **Migrate:** move bounded consumer batches. Each batch depends on expand;
+   add dependencies between batches only for real gates. Name the consumers,
+   observable behavior and compatibility checks for each batch.
+3. **Contract:** remove the old form after every migration batch. This issue
+   depends on all batches and requires evidence that relevant consumers no
+   longer need the old contract, plus final behavior and compatibility checks.
+
+Normally each stage passes the repository's required checks independently.
+If reasonable batches cannot do so, present the choice between a larger atomic
+unit and a shared integration branch with a final integrate-and-verify issue.
+For the branch option, specify ownership, per-stage checks, the final integration
+criteria and when stages may be marked complete. Use it only after explicit
+approval and when compatible with repository completion rules. Required
+verification and closure gates still apply; unmet gates remain visible blockers.
+
 ## Tracer-bullet test
 
-An implementation issue is ready only when all are true:
+A tracer-bullet issue passes its slicing check only when all are true:
 
 1. It names a consumer-visible or operator-visible result.
 2. Acceptance can be demonstrated through one public seam.
@@ -51,7 +72,10 @@ A horizontal title is not automatically wrong. It can be correct for prefactorin
 - Do not encode preferred sequence, shared topic, or convenient staffing as blocking.
 - Keep cross-epic blockers explicit.
 - Reject cycles.
-- The frontier contains ready or in-progress, non-done issues whose blockers are done.
+- The frontier contains issues that passed the readiness gate, have a ready or
+  in-progress status, and have all blockers completed under the project's rules.
+  Use the project's equivalents of these statuses. Draft, blocked and completed
+  items are excluded; having no blockers alone does not make an issue ready.
 - Put independent frontier items first in the proposal so parallel work is visible.
 
 ## Effort estimates
@@ -101,7 +125,7 @@ Every published issue should contain:
 ```text
 Parent epic
 What this issue delivers
-Acceptance criteria
+Acceptance criteria with planned evidence
 Blocked by
 Requirements covered
 Non-goals
@@ -110,6 +134,28 @@ Validation or demo seam
 ```
 
 Prefer behavior and constraints over implementation recipes. Mention exact files or symbols only when they are normative boundaries, migration targets, or necessary evidence from the repository.
+
+## Issue-readiness gate
+
+Before assigning a ready status, check each child's complete contract: result,
+scope and non-goals, applicable inputs and errors, ownership, material edge
+cases and a feasible way to verify acceptance. Apply the runtime acceptance
+requirements in [issue-dialogue](../../issue-dialogue/SKILL.md), under
+"Требования к готовой issue", to behavioral criteria. This is a contract check;
+use accepted decisions and resolve only substantive gaps rather than restarting
+the interview for every child.
+
+For structural or documentation criteria, name concrete diff/search, validator,
+link or render evidence; runtime fields may be inapplicable with a reason.
+Record planned observations, fixtures and commands without claiming that checks
+have already run. Source expected results from agreed requirements or verified
+pre-change observations. For preservation criteria with an unknown baseline,
+name its pre-change capture command and keep the output pending; fixture input
+order is not proof of existing output order.
+Keep an item Draft when a required observation or independent
+oracle is missing, scope is unresolved or the selected slicing mode cannot be
+verified. Valid hard blockers may still be pending on a ready issue; only the
+dependency rules determine whether it belongs to the runnable frontier.
 
 ## Final semantic audit
 
@@ -120,5 +166,7 @@ Before publishing, ask:
 - Are decisions separate from code when ownership differs?
 - Are blocker edges hard gates and acyclic?
 - Can each implementation issue be reviewed and demonstrated alone?
+- Do migration or integration exceptions have explicit checks and completion rules?
+- Does every ready issue pass the readiness gate, with Draft items excluded from the frontier?
 - Does the frontier expose safe parallel work?
 - Would a new agent understand each issue without reconstructing the entire decomposition conversation?

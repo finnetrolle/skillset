@@ -1,0 +1,457 @@
+{
+  "schema_version": 1,
+  "started_on": "2026-10-07",
+  "usage_snapshot": "data/usage-2026-10-07.json",
+  "review_order": [
+    "two-axis-review",
+    "tdd",
+    "minto-explain",
+    "caveman-commit",
+    "verify-changes",
+    "caveman",
+    "commit-push",
+    "implement",
+    "grill-me",
+    "issue-dialogue",
+    "axi",
+    "how-would-you-do-it",
+    "pdf",
+    "epic-to-issues",
+    "lavish",
+    "what-next",
+    "automation-platform-tco",
+    "analyze-via-sonar",
+    "archify",
+    "caveman-review",
+    "cavecrew",
+    "kdoc",
+    "platform-release-notes",
+    "arch-review-to-epic",
+    "find-skills",
+    "fix-sonar-problems",
+    "jira-repo-excel-matrix",
+    "skill-usage-report",
+    "sync-agent-skills",
+    "analyze-pitest",
+    "removed-presentation-template",
+    "caveman-compress",
+    "caveman-help",
+    "caveman-stats",
+    "diagnosing-bugs",
+    "domain-modeling",
+    "frontend-skill",
+    "github-ai-trending-pdf",
+    "landing-redline",
+    "playwright",
+    "security-best-practices",
+    "tailor-cv-to-vacancy",
+    "workshop-thesis-factcheck",
+    "writing-for-agents"
+  ],
+  "decisions": {
+    "two-axis-review": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "Это отличный скилл."
+    },
+    "tdd": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставить как есть"
+    },
+    "minto-explain": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставить как есть"
+    },
+    "caveman-commit": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляем"
+    },
+    "verify-changes": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляем"
+    },
+    "caveman": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставить"
+    },
+    "commit-push": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляем"
+    },
+    "implement": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляем"
+    },
+    "grill-me": {
+      "decision": "keep-with-changes",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "Показывать по возможности, сколько вопросов уже отвечено и сколько еще предполагается задать.",
+      "changes": [
+        "Перед очередным вопросом показывать число отвеченных вопросов и оценку оставшихся, включая текущий.",
+        "Обновлять оценку по ходу диалога и явно обозначать невозможность оценки.",
+        "Отделить счетчик прогресса от качественной оценки неоднозначности."
+      ],
+      "deployment_action": "Install the updated repository package during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "issue-dialogue": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляем"
+    },
+    "axi": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляем"
+    },
+    "how-would-you-do-it": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставить"
+    },
+    "pdf": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "использовать pdf буду только в codex",
+      "replacement": "pdf:pdf (Codex plugin)",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "epic-to-issues": {
+      "decision": "keep-with-changes",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "вносим",
+      "changes": [
+        "Единая готовность задач и исключение Draft/Blocked из runnable frontier.",
+        "Контракт планируемых доказательств приёмки из issue-dialogue с проверкой готовности каждой задачи.",
+        "Подробная схема expand/migrate/contract с зависимостями, проверками и правилами интеграционной ветки.",
+        "Проверка гранулярности, блокировок и merge/split при согласовании; публикация в порядке зависимостей с реальными ID."
+      ],
+      "comparison": {
+        "upstream_skill": "to-tickets",
+        "upstream_revision": "f3fc5632f401156837ee3872f14fe33ccf1024ea",
+        "package_changed_since_pin": false
+      },
+      "verification": {
+        "packaging_and_links": "passed",
+        "quick_validate": "passed",
+        "existing_work_item_validator_tests": 8,
+        "temporary_delivery": {
+          "skills": [
+            "domain-modeling",
+            "epic-to-issues",
+            "issue-dialogue"
+          ],
+          "files": 12,
+          "repeat_install": "unchanged",
+          "rollback": "passed"
+        },
+        "behavioral_scope": "Independent planning/publication fixtures and a focused regression-baseline repeat; service runtime was not executed.",
+        "behavioral_refinement": "Expected regression outputs use agreed requirements or verified observations; an unknown baseline has a named pre-change capture and remains pending."
+      },
+      "deployment_action": "Install the updated repository package during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "lavish": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "давай уберем lavish из системы совсем",
+      "deployment_action": "Remove installed skill aliases, installer registration, CLI cache and runtime state.",
+      "deployment_status": "complete",
+      "recovery_archive": ".cache/removals/lavish-20261007T112915",
+      "removed_components": [
+        "repository package",
+        "agent skill copies and aliases",
+        "installer registrations",
+        "lavish-axi npx cache",
+        "lavish-axi runtime state",
+        "13 targeted npm cache entries"
+      ],
+      "verification": {
+        "known_paths_absent": true,
+        "registries_absent": true,
+        "other_registry_entries_preserved": true,
+        "running_processes": 0,
+        "global_npm_installation": false,
+        "npm_cache_entries_remaining": 0
+      }
+    },
+    "what-next": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляй"
+    },
+    "automation-platform-tco": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "Специализированный скилл, не нужен в разработке.",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "analyze-via-sonar": {
+      "decision": "keep-with-changes",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "Оставить скилл, убрать привязку к проекту, чтобы использовать где угодно.",
+      "changes": [
+        "Определять сервер, project key/name, scope, ветку, scanner и команды по текущему проекту.",
+        "Переиспользовать настроенный сервер; локальный Docker использует выбранные имя, порт, image и volumes.",
+        "Выбирать Gradle, Maven или другой поддержанный scanner без принудительной смены build-конфигурации.",
+        "Использовать существующий источник секретов без обязательной привязки к .claude/sonar.env.",
+        "Сохранять свежесть анализа, полноту issues/hotspots, формат отчёта и историю; учитывать версию API."
+      ],
+      "deployment_action": "Install the updated repository package during explicit deployment after the audit.",
+      "deployment_status": "pending",
+      "verification": {
+        "packaging_and_links": "passed",
+        "quick_validate": "passed",
+        "temporary_delivery": {
+          "files": 3,
+          "repeat_install": "unchanged",
+          "rollback": "passed"
+        },
+        "runtime_scope": "No production SonarQube or scanner was run during the skill audit.",
+        "behavioral_scope": "Independent dry-run plans on isolated Gradle, Maven and Python fixtures; no actual build/scanner/server/API execution.",
+        "behavioral_results": [
+          "Gradle retained configured project key, port 9108, plugin, custom coverage task and SCM setting.",
+          "Maven retained remote URL/path prefix, profile and plugin; optional coverage was not made mandatory.",
+          "Python upload 503 preserved the old registry; stale metadata and old empty findings were rejected."
+        ],
+        "behavioral_refinement": "Project name uses the effective scanner/server value before the repository-name fallback for a new unnamed project."
+      }
+    },
+    "archify": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "Арчифай оставь - он крутой."
+    },
+    "caveman-review": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляем"
+    },
+    "cavecrew": {
+      "decision": "keep-with-changes",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "дорабатываем",
+      "changes": [
+        "Включены самодостаточные роли investigator, builder и reviewer и общий контракт.",
+        "Делегация выбирается по реально доступным инструментам и зарегистрированным типам агента в текущем хосте; при отсутствии - работа inline.",
+        "Удалены обязательные Claude-плагиновые пресеты, model overrides/hooks и неподтверждённые проценты экономии токенов.",
+        "Сохранены предел builder в 1-2 файла, read-only investigator/reviewer и краткие отчёты с доказательствами и ограничениями.",
+        "Перечитывание текста отделено от выполненных проверок; частичные изменения и ошибки не скрываются."
+      ],
+      "deployment_action": "Install the updated repository package during explicit deployment after the audit.",
+      "deployment_status": "pending",
+      "verification": {
+        "packaging_and_links": "passed",
+        "quick_validate": "passed",
+        "temporary_delivery": {
+          "files": 6,
+          "repeat_install": "unchanged",
+          "rollback": "passed"
+        },
+        "behavioral_scope": "Independent evaluation on four isolated fixtures. Host tool schemas were fixture inputs; actual Claude runtime and nested delegation were not run.",
+        "behavioral_results": [
+          "Codex investigator plan used the supplied spawn tool schema and found one definition and two code calls.",
+          "Inline read-only review found the limit=0 regression without editing reviewed files.",
+          "A coupled three-file task used general-agent scope rather than partitioned builders.",
+          "Claude plan used registered general-purpose; direct execution of the builder role reproduced the public CLI bug and passed three tests after a regression RED."
+        ],
+        "fixture_mutation_scope": "Only two explicitly permitted CLI fixture files changed; no home directories or external systems were changed."
+      }
+    },
+    "kdoc": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "Правила документации должны настраиваться отдельно для каждого проекта; согласовано удалить глобальный kdoc.",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "platform-release-notes": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "убираем",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "arch-review-to-epic": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставить"
+    },
+    "find-skills": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "можно убирать",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "fix-sonar-problems": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "убираем",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "jira-repo-excel-matrix": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляем"
+    },
+    "skill-usage-report": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставить"
+    },
+    "sync-agent-skills": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "убираем",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "analyze-pitest": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "убрать",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "removed-presentation-template": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "убираем",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "caveman-compress": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "убери",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "caveman-help": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "убери",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "caveman-stats": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "убирай",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "diagnosing-bugs": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставить"
+    },
+    "domain-modeling": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставить"
+    },
+    "frontend-skill": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "убрать. буду пользоваться им только в кодексе",
+      "deployment_action": "Preserve this skill for Codex only outside the shared repository-managed set; separate it from Claude access during explicit deployment after the audit. Do not delete the sole installed copy before preserving Codex access.",
+      "deployment_status": "pending"
+    },
+    "github-ai-trending-pdf": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляем"
+    },
+    "landing-redline": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "удалить",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "playwright": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "убираем",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "security-best-practices": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "проверь откуда скилл и обнови его из первоисточника",
+      "upstream_sync": {
+        "source": "openai",
+        "repository": "https://github.com/openai/skills.git",
+        "path": "skills/.curated/security-best-practices",
+        "revision": "49f948faa9258a0c61caceaf225e179651397431",
+        "checked_on": "2026-10-07",
+        "result": "already-current",
+        "matching_files": 13,
+        "content_changes": 0,
+        "license": "Apache-2.0",
+        "provenance_changes": "Register OpenAI source and pin, retain original import manifest, expose source in generated catalog and document explicit upstream-diff command."
+      },
+      "verification": {
+        "package_comparison": "All 13 files match upstream byte-for-byte and executable modes; no extra local files.",
+        "upstream_cli": "Pinned and latest revisions match; upstream package patch and local instruction patch are empty.",
+        "checks": [
+          "make check test catalog-check: passed, 22 tests",
+          "quick_validate.py: valid",
+          "git diff --check: passed"
+        ],
+        "behavioral_evaluation": "Not repeated because skill instructions and resources did not change."
+      }
+    },
+    "tailor-cv-to-vacancy": {
+      "decision": "remove",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "удалить",
+      "deployment_action": "Remove the personal installed copy during explicit deployment after the audit.",
+      "deployment_status": "pending"
+    },
+    "workshop-thesis-factcheck": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставить"
+    },
+    "writing-for-agents": {
+      "decision": "keep-as-is",
+      "confirmed_on": "2026-10-07",
+      "user_reason": "оставляем"
+    }
+  },
+  "completed_on": "2026-10-07",
+  "summary": {
+    "reviewed": 44,
+    "kept_as_is": 23,
+    "kept_with_changes": 4,
+    "excluded_from_repository": 17,
+    "repository_skills": 27,
+    "codex_only_outside_repository": [
+      "frontend-skill"
+    ],
+    "deployment_status": "pending",
+    "github_publication_status": "pending",
+    "verification": {
+      "check": "passed: 27 skills, 277 files",
+      "tests": "passed: 22 local tests",
+      "catalog": "current",
+      "audit_consistency": "all 44 decisions recorded; repository contains exactly the 27 retained skills",
+      "install_dry_run": "4 updates, 23 unchanged, no conflicts",
+      "excluded_installed_packages": "15 pending removal, 1 Codex-only skill to preserve, lavish already absent; all 16 present packages match their tracked manifests"
+    }
+  }
+}

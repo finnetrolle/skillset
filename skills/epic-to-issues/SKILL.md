@@ -28,24 +28,26 @@ Read [the slicing guide](references/slicing.md) before choosing issue boundaries
    - Separate irreversible or human-owned decisions from implementation.
    - Permit a module-level slice only at a stable public seam.
 4. Draft the delivery graph.
-   - Each implementation issue delivers one complete, demonstrable behavior.
+   - Each implementation issue delivers a demonstrable result under its selected slicing mode.
    - Each issue must fit one fresh agent context and normally one reviewable change.
    - State acceptance criteria at the consumer or public seam.
    - Include parent, blockers, requirements covered, non-goals, estimate range, and confidence.
    - Add a blocker edge only for a hard gate. Preferred order is not blocking.
-   - Reject cycles and compute the frontier: non-done issues whose blockers are done.
+   - Apply the slicing guide's issue-readiness gate before declaring an issue ready for implementation.
+   - Reject cycles and compute the frontier using the guide's dependency rules.
 5. Run the proposal gate before mutation.
    - Show epic outcome, mind map, proposed issues, delivered behavior, mode, blockers, estimates, frontier, open decisions, and intended file or tracker changes.
+   - Check whether the granularity fits, blockers are genuine gates, and any issues should be merged or split. Resolve material feedback before publication.
    - Ask for approval unless the user already explicitly authorized applying this exact decomposition now.
    - Resolve decisions that would materially change issue boundaries before publication.
 6. Publish after approval.
-   - Create one tracker item or Markdown file per issue.
+   - Create one tracker item or Markdown file per issue, in dependency order: blockers before dependents. Resolve approved proposal IDs to the actual file or tracker IDs before linking dependents; keep cross-epic references explicit.
    - Keep the epic concise but normative: outcome, scope, decisions, map, completion criteria, and linked child summary.
    - Preserve the original source by moving or linking it. Do not silently delete, close, or rewrite history.
    - Use native epic, subissue, and blocker relationships when the tracker supports them.
 7. Validate after publication.
    - Confirm every normative requirement is covered or explicitly out of scope.
-   - Recheck issue independence, verticality, estimates, hard blockers, DAG, and frontier.
+   - Recheck issue readiness, the selected slicing mode, estimates, hard blockers, DAG, and frontier. Draft items remain outside the runnable frontier.
    - Report created or moved items, validation result, frontier, and unresolved decisions.
 
 ## Local Markdown adapter

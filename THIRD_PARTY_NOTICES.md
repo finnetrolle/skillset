@@ -14,3 +14,10 @@ diagnosing-bugs, domain-modeling и writing-for-agents адаптированы 
 [mattpocock/skills](https://github.com/mattpocock/skills), коммит
 `dd400c3ad65e57c06f05e832e0aac92c7992f34d`, MIT, Copyright 2026 Matt Pocock.
 Полный текст MIT сохранён в LICENSE каждого из трёх пакетов.
+
+security-best-practices проверен по официальному
+[openai/skills](https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices),
+коммит `49f948faa9258a0c61caceaf225e179651397431`, Apache-2.0.
+Все 13 файлов пакета, включая LICENSE.txt, совпадают с этим источником.
+Исходный путь локального импорта сохранён в реестре отдельно от установленного
+первоисточника.

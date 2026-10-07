@@ -2,7 +2,7 @@
 
 ## Ambiguity scoring (the exit discipline)
 
-At exit, judge each of the five dimensions on this rubric. Score qualitatively - don't count questions or do arithmetic. The LLM is already assessing clarity during the interview; let that judgment speak directly.
+At exit, judge each of the five dimensions on this rubric. Score qualitatively from the artifact's current clarity. The LLM is already assessing clarity during the interview; let that judgment speak directly.
 
 ### The 0-to-1 rubric
 
@@ -105,7 +105,7 @@ The user can override the gate at any time by saying "enough", "exit", "ship it"
 
 ## Scoring discipline
 
-- **Don't count questions or do arithmetic.** The rubric is qualitative. Judge each dimension at exit based on your assessment of the artifact's current state, not by tallying unresolved items during the interview.
+- **Keep scoring separate from interview progress.** The rubric is qualitative. Judge each dimension at exit based on your assessment of the artifact's current state, not by tallying unresolved items during the interview.
 - **Score the artifact, not the interview.** If the user answered a question but the answer is still vague, that dimension is still ambiguous.
 - **Be honest about your own uncertainty.** If you're unsure whether a dimension is 0.25 or 0.5, pick the higher (more ambiguous) score. The gate is permissive (default 0.4 freeform) - it's OK to err toward calling things vague.
 - **Don't penalize unknowable things.** If a dimension is ambiguous because the user genuinely doesn't know yet and needs to prototype, that's a legitimate Open Question, not a scoring failure. Score it as "Assumption: 0.25" with a note, not "Assumption: 1.0".
