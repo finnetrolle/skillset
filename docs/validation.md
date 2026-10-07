@@ -45,3 +45,22 @@ Bundled quick_validate.py дополнительно пропустил 42 па�
 user-invocable и argument-hint/author. Эти исходные поля не удалены ради
 валидатора: собственная проверка сохраняет совместимость набора с обоими
 хостами и проверяет обязательные name/description и ресурсы.
+
+## Фактическая поставка 07.10.2026
+
+- Приватный [finnetrolle/skillset](https://github.com/finnetrolle/skillset) создан;
+  история и retained resources загружены.
+- Свежий HTTPS-клон: `make setup`, `make check test catalog-check` успешны,
+  22 теста. Установка 44 пакетов проверена по содержимому и executable mode
+  всех 334 файлов; повторный install unchanged; rollback восстановил пустой target.
+- Рабочая папка `~/.agents/skills`: 44 пакета совпадают с репозиторием.
+  10 известных старых копий перенесены из `~/.codex/skills`; .system сохранён.
+  Backup transaction: `20261007T100311-fa5d4639` в
+  `~/.agents/skills/.skillset/transactions/`.
+- Workflow проходит официальный actionlint 1.7.12. Actions включён, разрешены
+  все actions. Однако push и
+  [ручной запуск](https://github.com/finnetrolle/skillset/actions/runs/37605566010)
+  завершились `startup_failure` до создания jobs. Журналов нет, конкретная
+  причина через API не раскрывается. Успешный remote CI пока не подтверждён;
+  сообщение в авторизованном веб-интерфейсе GitHub требуется для дальнейшего
+  устранения. Локальные проверки выполнены независимо от этого сбоя.
