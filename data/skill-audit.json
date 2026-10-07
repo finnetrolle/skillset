@@ -480,7 +480,7 @@
     },
     "deployment": {
       "applied_on": "2026-10-07",
-      "source_commit": "d61c7aff47a45a3723080276c9764ee31f76a25f",
+      "source_commit": "0140ffe8d2e3c553874e6567eea392c2d219b3f5",
       "shared_target": "/Users/finnetrolle/.agents/skills",
       "matching_skills": 27,
       "matching_files": 277,
@@ -504,5 +504,14 @@
       "verification": "All retained repository packages match installed content and executable modes; all excluded personal paths absent except the Codex-only frontend copy; no pending transactions.",
       "github": "Source commit pushed to origin/main in finnetrolle/skillset."
     }
+  },
+  "publication_cleanup": {
+    "completed_on": "2026-10-07",
+    "scope": "All reachable Git history and current repository materials.",
+    "removed_material": "Removed corporate presentation template, including binary assets.",
+    "audit_entry": "Anonymized as removed-presentation-template; original decisions and counts preserved.",
+    "historical_catalogs": "Regenerated with scripts/catalog.py after excluding the template.",
+    "retained_skill_packages": "Unchanged: 27 packages, 277 files.",
+    "commit_references": "Updated for the rewritten history; installed package fingerprints are unchanged."
   }
 }
