@@ -2,7 +2,7 @@ PYTHON ?= .venv/bin/python
 TARGET ?= $(HOME)/.agents/skills
 SKILL_ARG = $(if $(SKILL),--skill $(SKILL),)
 
-.PHONY: setup check test list diff install rollback upstream-check upstream-diff catalog catalog-check
+.PHONY: setup check test list diff install rollback upstream-check upstream-diff
 
 setup:
 	python3 -m venv .venv
@@ -31,9 +31,3 @@ upstream-check:
 
 upstream-diff:
 	@$(PYTHON) scripts/manage.py upstream-diff --skill "$(SKILL)"
-
-catalog:
-	@$(PYTHON) scripts/catalog.py
-
-catalog-check:
-	@$(PYTHON) scripts/catalog.py --check

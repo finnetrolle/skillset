@@ -269,7 +269,7 @@
         "package_comparison": "All 13 files match upstream byte-for-byte and executable modes; no extra local files.",
         "upstream_cli": "Pinned and latest revisions match; upstream package patch and local instruction patch are empty.",
         "checks": [
-          "make check test catalog-check: passed, 22 tests",
+          "make check test: passed, 22 tests",
           "quick_validate.py: valid",
           "git diff --check: passed"
         ],
@@ -297,8 +297,8 @@
     "verification": {
       "check": "passed: 27 skills, 277 files",
       "tests": "passed: 22 local tests",
-      "catalog": "current",
-      "audit_consistency": "All 27 current packages have confirmed decisions; audit, usage selection, source catalog and folders agree."
+      "audit_consistency": "All 27 current packages have confirmed decisions; audit, usage selection, source catalog and folders agree.",
+      "skill_guide": "27 descriptions, one per current package"
     },
     "deployment": {
       "applied_on": "2026-10-07",
