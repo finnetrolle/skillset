@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tailor CV to Vacancy"
+  short_description: "Create a truthful vacancy-targeted CV"
+  default_prompt: "Use $tailor-cv-to-vacancy to create a targeted CV from my source CV and vacancy."

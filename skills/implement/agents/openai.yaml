@@ -1,0 +1,6 @@
+interface:
+  display_name: "Implement"
+  short_description: "Route and implement one tracked issue"
+  default_prompt: "$implement <exact-work-item-id>"
+policy:
+  allow_implicit_invocation: false

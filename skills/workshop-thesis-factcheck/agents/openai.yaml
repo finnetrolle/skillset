@@ -1,0 +1,4 @@
+interface:
+  display_name: "Фактчекинг воркшопа"
+  short_description: "Поблочная экстракция и фактчекинг тезисов"
+  default_prompt: "Используй $workshop-thesis-factcheck, чтобы выделить тезисы из текста воркшопа и проверить каждый тезис по источникам."

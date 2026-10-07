@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Set Sync"
+  short_description: "Compare and align Codex and Claude skills"
+  default_prompt: "Use $sync-agent-skills to compare my personal Codex and Claude Code skills and propose a safe merge."

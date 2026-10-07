@@ -1,0 +1,4 @@
+interface:
+  display_name: "Issue Dialogue"
+  short_description: "Создание issue через короткое интервью"
+  default_prompt: "Используй $issue-dialogue, чтобы проработать идею и создать implementation-ready issue."

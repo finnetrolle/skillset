@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jira Repo Excel Matrix"
+  short_description: "Map Jira tasks to repos in Excel"
+  default_prompt: "Use $jira-repo-excel-matrix to scan release commits and create a task-by-repository Excel matrix."

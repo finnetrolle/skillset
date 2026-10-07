@@ -1,0 +1,4 @@
+interface:
+  display_name: "how-would-you-do-it"
+  short_description: "План по issue и коду, согласование и запись в задачу"
+  default_prompt: "Используй $how-would-you-do-it: изучи требования этой issue и текущий код, предложи краткий план, обсуди со мной правки и предложи записать согласованный результат в задачу."

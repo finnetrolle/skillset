@@ -1,0 +1,7 @@
+interface:
+  display_name: "minto-explain"
+  short_description: "Краткие объяснения по Минто: SCQA и caveman"
+  default_prompt: "Используй $minto-explain, чтобы кратко объяснить тему через SCQA."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,378 @@
+#!/usr/bin/env bash
+
+# Machine-local SonarQube fallback for verify-changes. Repository scripts take
+# precedence. This helper scans the current Git repository, queries SonarQube,
+# and blocks only findings attached to files in the verification scope.
+
+set -Eeuo pipefail
+
+readonly config_file="${VERIFY_SONAR_ENV_FILE:-${XDG_CONFIG_HOME:-$HOME/.config}/verify-changes/sonar.env}"
+readonly out_dir="build/pipeline/sonar"
+
+step() { printf '\n== %s ==\n' "$1"; }
+die_environment() { echo "ENVIRONMENT FAILURE: $*" >&2; exit 2; }
+unexpected_failure() {
+    local status="$1" line="$2"
+    trap - ERR
+    echo "ENVIRONMENT FAILURE: command failed with status ${status} at line ${line}" >&2
+    exit 2
+}
+trap 'unexpected_failure "$?" "$LINENO"' ERR
+
+for tool in jq curl docker git awk sed sort mktemp grep find paste tr basename id; do
+    command -v "$tool" >/dev/null 2>&1 || die_environment "missing required tool: $tool"
+done
+
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null)" \
+    || die_environment "current directory is not inside a Git repository"
+cd "$repo_root"
+
+[[ -f "$config_file" ]] \
+    || die_environment "${config_file} not found; create it with SONAR_TOKEN and SONAR_ADMIN_PASSWORD"
+chmod 600 "$config_file" \
+    || die_environment "cannot restrict ${config_file} to mode 0600"
+
+read_env_value() {
+    local key="$1" value
+    value="$(awk -v key="$key" '
+        index($0, key "=") == 1 { value = substr($0, length(key) + 2) }
+        END { print value }
+    ' "$config_file")"
+    if [[ ${#value} -ge 2 ]] && { [[ "$value" == \'*\' ]] || [[ "$value" == \"*\" ]]; }; then
+        value="${value:1:${#value}-2}"
+    fi
+    printf '%s' "$value"
+}
+
+sonar_url="$(read_env_value SONAR_URL)"
+scanner_url="$(read_env_value SONAR_SCANNER_URL)"
+container_name="$(read_env_value SONAR_CONTAINER_NAME)"
+admin_login="$(read_env_value SONAR_ADMIN_LOGIN)"
+admin_password="$(read_env_value SONAR_ADMIN_PASSWORD)"
+stored_token="$(read_env_value SONAR_TOKEN)"
+scanner_image="$(read_env_value SONAR_SCANNER_IMAGE)"
+
+sonar_url="${sonar_url:-http://localhost:9000}"
+scanner_url="${scanner_url:-http://host.docker.internal:9000}"
+container_name="${container_name:-verify-changes-sonar}"
+admin_login="${admin_login:-admin}"
+scanner_image="${scanner_image:-sonarsource/sonar-scanner-cli:latest}"
+
+if [[ -n "${VERIFY_BASE_REF:-}" ]]; then
+    git rev-parse --verify "${VERIFY_BASE_REF}^{commit}" >/dev/null 2>&1 \
+        || die_environment "invalid VERIFY_BASE_REF '${VERIFY_BASE_REF}'"
+    comparison_base="$(git merge-base "$VERIFY_BASE_REF" HEAD)"
+    [[ -n "$comparison_base" ]] \
+        || die_environment "no merge-base between ${VERIFY_BASE_REF} and HEAD"
+    scope_label="${VERIFY_BASE_REF} (merge-base ${comparison_base})"
+else
+    comparison_base="HEAD"
+    scope_label="dirty tree relative to HEAD"
+fi
+
+touched_files="$({
+    git diff --name-only "$comparison_base"
+    git ls-files --others --exclude-standard
+} | sort -u)"
+[[ -n "$touched_files" ]] \
+    || die_environment "verification scope is empty; provide VERIFY_BASE_REF or create a dirty diff"
+echo "verification scope: ${scope_label}"
+
+docker_info_log="$(mktemp "${TMPDIR:-/tmp}/verify-sonar-docker.XXXXXX")" \
+    || die_environment "cannot create Docker preflight log"
+docker info >"$docker_info_log" 2>&1 &
+docker_info_pid=$!
+(
+    sleep 10
+    if kill -0 "$docker_info_pid" 2>/dev/null; then
+        kill -TERM "$docker_info_pid" 2>/dev/null || true
+        sleep 1
+        kill -KILL "$docker_info_pid" 2>/dev/null || true
+    fi
+) &
+docker_watchdog_pid=$!
+if wait "$docker_info_pid" 2>/dev/null; then
+    docker_info_status=0
+else
+    docker_info_status=$?
+fi
+kill "$docker_watchdog_pid" 2>/dev/null || true
+wait "$docker_watchdog_pid" 2>/dev/null || true
+rm -f "$docker_info_log"
+(( docker_info_status == 0 )) \
+    || die_environment "Docker daemon is unavailable or did not respond within 10s"
+
+step "1/6 SonarQube container"
+status="$(curl -sS --connect-timeout 3 --max-time 5 "${sonar_url}/api/system/status" \
+    | jq -r '.status // empty' 2>/dev/null || true)"
+if [[ "$status" != "UP" ]]; then
+    if [[ -n "$(docker ps -a --filter "name=^/${container_name}$" --format '{{.Names}}')" ]]; then
+        echo "starting container ${container_name}"
+        docker start "$container_name" >/dev/null \
+            || die_environment "failed to start ${container_name}"
+    else
+        die_environment "SonarQube is unavailable and container ${container_name} does not exist"
+    fi
+fi
+
+deadline=$((SECONDS + 180))
+while :; do
+    status="$(curl -sS --connect-timeout 3 --max-time 5 "${sonar_url}/api/system/status" \
+        | jq -r '.status // empty' 2>/dev/null || true)"
+    [[ "$status" == "UP" ]] && break
+    (( SECONDS < deadline )) \
+        || die_environment "SonarQube did not reach UP within 180s (last status: '${status}')"
+    sleep 5
+done
+echo "SonarQube is UP at ${sonar_url}"
+
+step "2/6 analysis token"
+token=""
+if [[ -n "$stored_token" ]]; then
+    valid="$(curl -fsS --connect-timeout 5 --max-time 15 -u "${stored_token}:" \
+        "${sonar_url}/api/authentication/validate" | jq -r '.valid // false' || true)"
+    if [[ "$valid" == "true" ]]; then
+        token="$stored_token"
+    else
+        echo "stored SONAR_TOKEN is invalid; generating a replacement"
+    fi
+fi
+
+repo_name="$(basename "$repo_root")"
+repo_slug="$(printf '%s' "$repo_name" | tr -cs '[:alnum:]_.-' '-' | sed 's/^-//; s/-$//')"
+repo_identity="$(git config --get remote.origin.url || printf '%s' "$repo_root")"
+if command -v shasum >/dev/null 2>&1; then
+    repo_hash="$(printf '%s' "$repo_identity" | shasum -a 256 | awk '{print substr($1, 1, 12)}')"
+elif command -v sha256sum >/dev/null 2>&1; then
+    repo_hash="$(printf '%s' "$repo_identity" | sha256sum | awk '{print substr($1, 1, 12)}')"
+else
+    die_environment "missing required tool: shasum or sha256sum"
+fi
+project_key="${VERIFY_SONAR_PROJECT_KEY:-local:${repo_slug}:${repo_hash}}"
+token_name="verify-changes-${repo_slug}-${repo_hash}"
+
+persist_token() {
+    local value="$1" tmp
+    tmp="$(mktemp "${config_file}.tmp.XXXXXX")" \
+        || die_environment "cannot create temporary token file"
+    chmod 600 "$tmp"
+    awk '!/^SONAR_TOKEN=/' "$config_file" > "$tmp"
+    printf 'SONAR_TOKEN=%s\n' "$value" >> "$tmp"
+    mv "$tmp" "$config_file"
+}
+
+if [[ -z "$token" ]]; then
+    [[ -n "$admin_password" ]] \
+        || die_environment "SONAR_TOKEN is invalid or missing and SONAR_ADMIN_PASSWORD is empty in ${config_file}"
+    curl -fsS --connect-timeout 5 --max-time 20 \
+        -u "${admin_login}:${admin_password}" -X POST \
+        --data-urlencode "name=${token_name}" \
+        "${sonar_url}/api/user_tokens/revoke" >/dev/null 2>&1 || true
+    generated="$(curl -fsS --connect-timeout 5 --max-time 30 \
+        -u "${admin_login}:${admin_password}" -X POST \
+        --data-urlencode "name=${token_name}" \
+        "${sonar_url}/api/user_tokens/generate")" \
+        || die_environment "token generation failed; check SONAR_ADMIN_LOGIN and SONAR_ADMIN_PASSWORD"
+    token="$(printf '%s' "$generated" | jq -r '.token // empty')"
+    [[ -n "$token" ]] \
+        || die_environment "token generation returned no token; check SonarQube permissions"
+    persist_token "$token"
+fi
+echo "token OK"
+
+step "3/6 Sonar analysis"
+rm -rf "$out_dir"
+mkdir -p "$out_dir"
+report_task=""
+
+if [[ -x ./gradlew ]] && ./gradlew -q help --task :jacocoTestReport >/dev/null 2>&1; then
+    echo "generating JaCoCo coverage"
+    ./gradlew :jacocoTestReport \
+        || die_environment "JaCoCo report generation failed"
+fi
+
+has_gradle_sonar=false
+if [[ -x ./gradlew ]] && ./gradlew -q tasks --all 2>/dev/null | awk '{print $1}' | grep -qx 'sonar'; then
+    has_gradle_sonar=true
+fi
+
+if [[ "$has_gradle_sonar" == "true" ]]; then
+    echo "using repository Gradle sonar task"
+    if ! SONAR_TOKEN="$token" ./gradlew sonar \
+        -Dsonar.host.url="$sonar_url" \
+        -Dsonar.projectKey="$project_key" \
+        -Dsonar.projectName="$repo_name" \
+        -Dsonar.scm.disabled=true; then
+        die_environment "Gradle Sonar analysis failed"
+    fi
+    report_task="build/sonar/report-task.txt"
+else
+    echo "using Docker SonarScanner (${scanner_image})"
+    scanner_args=(
+        "-Dsonar.projectKey=${project_key}"
+        "-Dsonar.projectName=${repo_name}"
+        "-Dsonar.sources=."
+        "-Dsonar.tests=."
+        "-Dsonar.exclusions=**/build/**,**/.gradle/**,**/.git/**,**/*.jar,**/*.klib,**/*.class,**/*.zip,**/src/test/**,**/src/*Test/**,**/src/commonTest/**,**/src/jvmTest/**,**/src/linuxX64Test/**,**/src/mingwX64Test/**"
+        "-Dsonar.test.inclusions=**/src/test/**,**/src/*Test/**,**/src/commonTest/**,**/src/jvmTest/**,**/src/linuxX64Test/**,**/src/mingwX64Test/**"
+        "-Dsonar.scm.disabled=true"
+        "-Dsonar.working.directory=${out_dir}/.scannerwork"
+    )
+
+    binaries="$(find . -type d \( \
+        -path '*/build/classes/*/main' -o \
+        -path '*/build/classes/java/main' -o \
+        -path '*/target/classes' \
+    \) -print | sed 's#^\./##' | sort -u | paste -sd, -)"
+    [[ -z "$binaries" ]] || scanner_args+=("-Dsonar.java.binaries=${binaries}")
+
+    coverage="$(find . -type f -path '*/build/reports/jacoco/*/*.xml' -print \
+        | sed 's#^\./##' | sort -u | paste -sd, -)"
+    [[ -z "$coverage" ]] || scanner_args+=("-Dsonar.coverage.jacoco.xmlReportPaths=${coverage}")
+
+    if ! docker run --rm \
+        --add-host host.docker.internal:host-gateway \
+        --user "$(id -u):$(id -g)" \
+        -e "SONAR_HOST_URL=${scanner_url}" \
+        -e "SONAR_TOKEN=${token}" \
+        -e "SONAR_USER_HOME=/tmp/.sonar" \
+        -v "${repo_root}:/usr/src" \
+        -w /usr/src \
+        "$scanner_image" "${scanner_args[@]}"; then
+        die_environment "Docker SonarScanner analysis failed"
+    fi
+    report_task="${out_dir}/.scannerwork/report-task.txt"
+fi
+
+[[ -f "$report_task" ]] || die_environment "${report_task} was not produced"
+ce_task_id="$(awk -F= '$1 == "ceTaskId" { print substr($0, index($0, "=") + 1) }' "$report_task")"
+report_project_key="$(awk -F= '$1 == "projectKey" { print substr($0, index($0, "=") + 1) }' "$report_task")"
+[[ -n "$ce_task_id" ]] || die_environment "ceTaskId missing from ${report_task}"
+[[ -n "$report_project_key" ]] || die_environment "projectKey missing from ${report_task}"
+project_key="$report_project_key"
+
+echo "waiting for SonarQube background task"
+deadline=$((SECONDS + 180))
+while :; do
+    ce_response="$(curl -fsS --connect-timeout 5 --max-time 15 -u "${token}:" \
+        "${sonar_url}/api/ce/task?id=${ce_task_id}")" \
+        || die_environment "cannot read SonarQube background task"
+    ce_status="$(printf '%s' "$ce_response" | jq -r '.task.status // empty')"
+    case "$ce_status" in
+        SUCCESS) break ;;
+        FAILED|CANCELED) die_environment "SonarQube background task ended with ${ce_status}" ;;
+    esac
+    (( SECONDS < deadline )) \
+        || die_environment "SonarQube background task timed out after 180s"
+    sleep 2
+done
+echo "SonarQube background task succeeded"
+
+step "4/6 fetch results via API"
+project_key_enc="$(jq -rn --arg value "$project_key" '$value | @uri')"
+
+fetch_pages() {
+    local endpoint="$1" extra="$2" merge_key="$3" out="$4"
+    local page=1 pages=1 body total
+    : > "$out"
+    while (( page <= pages )); do
+        body="$(curl -fsS --connect-timeout 5 --max-time 30 -u "${token}:" \
+            "${sonar_url}${endpoint}?${extra}&ps=500&p=${page}")" \
+            || die_environment "cannot fetch ${endpoint} page ${page}"
+        printf '%s' "$body" | jq -e . >/dev/null \
+            || die_environment "invalid JSON from ${endpoint} page ${page}"
+        if (( page == 1 )); then
+            printf '%s' "$body" > "$out"
+        else
+            jq -s --arg key "$merge_key" \
+                '.[0][$key] = (.[0][$key] + (.[1][$key] // [])) | .[0]' \
+                "$out" <(printf '%s' "$body") > "${out}.tmp"
+            mv "${out}.tmp" "$out"
+        fi
+        total="$(jq -r '.total // .paging.total // 0' "$out")"
+        pages=$(( (total + 499) / 500 ))
+        (( pages == 0 )) && pages=1
+        (( page++ ))
+    done
+}
+
+curl -fsS --connect-timeout 5 --max-time 30 -u "${token}:" \
+    "${sonar_url}/api/qualitygates/project_status?projectKey=${project_key_enc}" \
+    > "${out_dir}/qualitygate.json" \
+    || die_environment "cannot fetch quality gate"
+quality_gate="$(jq -r '.projectStatus.status // "UNKNOWN"' "${out_dir}/qualitygate.json")"
+[[ "$quality_gate" == "OK" || "$quality_gate" == "ERROR" ]] \
+    || die_environment "quality gate status is ${quality_gate}"
+
+curl -fsS --connect-timeout 5 --max-time 30 -u "${token}:" \
+    "${sonar_url}/api/measures/component?component=${project_key_enc}&metricKeys=bugs,vulnerabilities,security_hotspots,code_smells,coverage,duplicated_lines_density,ncloc,sqale_rating,reliability_rating,security_rating" \
+    > "${out_dir}/measures.json" \
+    || die_environment "cannot fetch project measures"
+jq -e '.component.measures' "${out_dir}/measures.json" >/dev/null \
+    || die_environment "invalid measures response"
+
+fetch_pages "/api/issues/search" "componentKeys=${project_key_enc}&resolved=false" issues "${out_dir}/issues.json"
+fetch_pages "/api/hotspots/search" "projectKey=${project_key_enc}" hotspots "${out_dir}/hotspots.json"
+
+jq -s '[.[0].issues[]?.rule] + [.[1].hotspots[]?.ruleKey] | map(select(. != null)) | unique' \
+    "${out_dir}/issues.json" "${out_dir}/hotspots.json" > "${out_dir}/.rule_keys.json"
+
+rules_json="[]"
+while IFS= read -r rule_key; do
+    [[ -n "$rule_key" ]] || continue
+    rule_key_enc="$(jq -rn --arg value "$rule_key" '$value | @uri')"
+    curl -fsS --connect-timeout 5 --max-time 30 -u "${token}:" \
+        "${sonar_url}/api/rules/show?key=${rule_key_enc}" \
+        | jq -e 'select(.rule.key != null) | {key: .rule.key, name: .rule.name,
+            severity: .rule.severity, type: .rule.type,
+            descriptionSections: .rule.descriptionSections}' \
+        > "${out_dir}/.rule.json" \
+        || die_environment "cannot fetch rule ${rule_key}"
+    rules_json="$(jq -s '.[0] + [.[1]]' \
+        <(printf '%s' "$rules_json") "${out_dir}/.rule.json")"
+done < <(jq -r '.[]' "${out_dir}/.rule_keys.json")
+printf '%s' "$rules_json" > "${out_dir}/rules.json"
+rm -f "${out_dir}/.rule_keys.json" "${out_dir}/.rule.json"
+
+step "5/6 filter findings to touched files"
+printf '%s\n' "$touched_files" > "${out_dir}/.touched"
+touched_json="$(jq -R . "${out_dir}/.touched" | jq -s 'map(select(length > 0))')"
+
+jq -n --argjson touched "$touched_json" \
+    --arg scope "$scope_label" \
+    --arg component_prefix "${project_key}:" \
+    --slurpfile issues "${out_dir}/issues.json" \
+    --slurpfile hotspots "${out_dir}/hotspots.json" \
+    --slurpfile gate "${out_dir}/qualitygate.json" \
+    '{
+        verification_scope: $scope,
+        quality_gate: ($gate[0].projectStatus.status // "UNKNOWN"),
+        touched_files: $touched,
+        blocking_issues: [
+            $issues[0].issues[]?
+            | ((.component | ltrimstr($component_prefix) | gsub(":"; "/"))) as $file
+            | select($touched | index($file))
+            | {type, severity, file: $file, line, rule, message}
+        ],
+        blocking_hotspots: [
+            $hotspots[0].hotspots[]?
+            | ((.component | ltrimstr($component_prefix) | gsub(":"; "/"))) as $file
+            | select($touched | index($file))
+            | {ruleKey, vulnerabilityProbability, file: $file, line, message}
+        ],
+        total_issues: ($issues[0].issues | length),
+        total_hotspots: ($hotspots[0].hotspots | length)
+    }' > "${out_dir}/verdict.json"
+rm -f "${out_dir}/.touched"
+
+step "6/6 verdict"
+jq '{verification_scope, quality_gate, touched_files, blocking_issues,
+    blocking_hotspots, total_issues, total_hotspots}' "${out_dir}/verdict.json"
+
+blocking="$(jq '(.blocking_issues | length) + (.blocking_hotspots | length)' \
+    "${out_dir}/verdict.json")"
+if (( blocking > 0 )); then
+    echo "BLOCKING: ${blocking} finding(s) in touched files"
+    exit 1
+fi
+echo "no blocking findings in touched files; out-of-scope findings remain as registry debt"

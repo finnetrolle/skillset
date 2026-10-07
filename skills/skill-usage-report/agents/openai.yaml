@@ -1,0 +1,4 @@
+interface:
+  display_name: "Эффективность скиллов"
+  short_description: "Частота, токены и время по скиллам за месяц"
+  default_prompt: "Используй $skill-usage-report для сводки по моим скиллам за последние 30 дней."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Commit and Push"
+  short_description: "Commit and push without extra validation gates"
+  default_prompt: "Use $commit-push to commit and push the current task changes directly."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Epic to Issues"
+  short_description: "Split epics into shippable issue slices"
+  default_prompt: "Use $epic-to-issues to split this oversized work into approved vertical issues."

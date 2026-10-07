@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub AI Trending PDF"
+  short_description: "Generate GitHub AI trending PDF reports"
+  default_prompt: "Use $github-ai-trending-pdf to generate an updated GitHub Trending AI report PDF."
